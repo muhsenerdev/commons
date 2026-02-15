@@ -59,6 +59,8 @@
         </plugins>
     </build>
     <modules>
+        <module>commons-core</module>
+        <module>commons-jpa</module>
         <module>users</module>
     </modules>
 

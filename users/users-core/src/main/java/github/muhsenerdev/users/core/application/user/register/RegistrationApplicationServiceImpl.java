@@ -4,6 +4,7 @@ import java.util.Set;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import github.muhsenerdev.commons.core.vo.RoleName;
 import github.muhsenerdev.users.api.application.registration.RegisterUserBaseCommand;
@@ -33,6 +34,7 @@ public class RegistrationApplicationServiceImpl<T extends RegisterUserBaseComman
 
     @SuppressWarnings("null")
     @Override
+    @Transactional
     public UserRegistrationResponse register(T command) {
         strategy.validate(command);
 

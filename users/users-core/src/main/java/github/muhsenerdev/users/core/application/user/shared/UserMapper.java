@@ -8,7 +8,10 @@ import org.mapstruct.Mapping;
 import github.muhsenerdev.commons.core.vo.CommonVoMapper;
 import github.muhsenerdev.users.api.application.registration.RegisterUserBaseCommand;
 import github.muhsenerdev.users.api.application.registration.UserRegisteredEvent;
+import github.muhsenerdev.users.api.application.registration.VerificationCodeResentEvent;
+import github.muhsenerdev.users.core.application.user.resend_code.CodeResendResponse;
 import github.muhsenerdev.users.core.domain.roles.Role;
+import github.muhsenerdev.users.core.domain.users.EmailVerification;
 import github.muhsenerdev.users.core.domain.users.RegistrationType;
 import github.muhsenerdev.users.core.domain.users.User;
 import github.muhsenerdev.users.core.domain.users.UserCreationInput;
@@ -24,4 +27,11 @@ public interface UserMapper {
     @Mapping(target = "verificationExpiresAt", source = "emailVerification.expiresAt")
     @Mapping(target = "verificationCode", source = "emailVerification.code")
     UserRegisteredEvent toUserRegisteredEvent(User user);
+
+    @Mapping(target = "userId", source = "id")
+    @Mapping(target = "verificationExpiresAt", source = "emailVerification.expiresAt")
+    @Mapping(target = "verificationCode", source = "emailVerification.code")
+    VerificationCodeResentEvent toVerificationCodeResentEvent(User user);
+
+    CodeResendResponse toCodeResendResponse(EmailVerification emailVerification);
 }

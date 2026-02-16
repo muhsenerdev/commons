@@ -158,6 +158,10 @@ public class User extends SoftDeletableEntity {
         return this.emailVerification.isVerifying();
     }
 
+    public void resendVerificationCode() {
+        this.emailVerification = this.emailVerification.resendCode();
+    }
+
     protected void setRoles(Set<Role> newRoles) {
         this.roles = newRoles;
     }

@@ -8,7 +8,20 @@
         <artifactId>users</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-
     <artifactId>users-api</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>github.muhsenerdev</groupId>
+            <artifactId>commons-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>github.muhsenerdev</groupId>
+            <artifactId>commons-core</artifactId>
+        </dependency>
+
+
+    </dependencies>
+
 
 </project>

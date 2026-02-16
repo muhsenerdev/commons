@@ -1,4 +1,4 @@
-package github.muhsenerdev.users.core.domain.vo;
+package github.muhsenerdev.users.core.domain.users;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;

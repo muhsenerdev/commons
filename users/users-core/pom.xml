@@ -15,13 +15,37 @@
         <dependency>
             <groupId>github.muhsenerdev</groupId>
             <artifactId>commons-jpa</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <scope>runtime</scope>
+            <groupId>github.muhsenerdev</groupId>
+            <artifactId>commons-web</artifactId>
         </dependency>
+        <dependency>
+            <groupId>github.muhsenerdev</groupId>
+            <artifactId>users-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <!-- Source: https://mvnrepository.com/artifact/org.passay/passay -->
+        <dependency>
+            <groupId>org.passay</groupId>
+            <artifactId>passay</artifactId>
+        </dependency>
+        <!-- Source: https://mvnrepository.com/artifact/org.mapstruct/mapstruct -->
+
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-testcontainers</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

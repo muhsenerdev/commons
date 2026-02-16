@@ -1,4 +1,4 @@
-package github.muhsenerdev.users.core.domain;
+package github.muhsenerdev.users.core.domain.users;
 
 import github.muhsenerdev.commons.core.exception.InvalidDomainException;
 import github.muhsenerdev.commons.core.vo.SingleVO;
@@ -16,6 +16,12 @@ public class HashedPassword extends SingleVO<String> {
 
     }
 
+    /**
+     * To generate hashed password, call @PasswordService.hash()
+     * 
+     * @param value Hashed password value
+     * @return HashedPassword
+     */
     @Builder
     public static HashedPassword of(String value) {
         return new HashedPassword(value);
@@ -28,7 +34,7 @@ public class HashedPassword extends SingleVO<String> {
     }
 
     @Override
-    protected String getValue() {
+    public String getValue() {
         return this.password;
     }
 

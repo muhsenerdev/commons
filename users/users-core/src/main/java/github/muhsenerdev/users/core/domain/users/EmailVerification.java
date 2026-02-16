@@ -1,5 +1,6 @@
-package github.muhsenerdev.users.core.domain.vo;
+package github.muhsenerdev.users.core.domain.users;
 
+import java.time.Duration;
 import java.time.OffsetDateTime;
 
 import github.muhsenerdev.commons.core.util.RandomUtil;
@@ -20,6 +21,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class EmailVerification {
 
+    private static final Duration EXPIRATION_DURATION = Duration.ofSeconds(30);
+
     @Column(name = "verification_code")
     private String code;
 
@@ -39,10 +42,24 @@ public class EmailVerification {
     public static EmailVerification create() {
         return EmailVerification.builder()
                 .code(RandomUtil.generateRandomCode(6))
-                .expiresAt(OffsetDateTime.now().plusHours(24))
+                .expiresAt(OffsetDateTime.now().plus(EXPIRATION_DURATION))
                 .status(VerificationStatus.VERIFYING)
                 .resendCount(0)
                 .resendableAt(OffsetDateTime.now())
                 .build();
+    }
+
+    public static EmailVerification verified() {
+        return EmailVerification.builder()
+                .status(VerificationStatus.VERIFIED)
+                .build();
+    }
+
+    public boolean isExpired() {
+        return this.status == VerificationStatus.EXPIRED || this.expiresAt.isBefore(OffsetDateTime.now());
+    }
+
+    public boolean isVerifying() {
+        return this.status == VerificationStatus.VERIFYING;
     }
 }

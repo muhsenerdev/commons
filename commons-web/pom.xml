@@ -9,13 +9,17 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>users</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>commons-web</artifactId>
 
-
-    <modules>
-        <module>users-api</module>
-        <module>users-core</module>
-    </modules>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>github.muhsenerdev</groupId>
+            <artifactId>commons-core</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>

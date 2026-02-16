@@ -1,4 +1,4 @@
-package github.muhsenerdev.users.core.domain.vo;
+package github.muhsenerdev.users.core.domain.users;
 
 import github.muhsenerdev.commons.core.exception.InvalidDomainException;
 import lombok.Getter;

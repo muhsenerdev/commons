@@ -1,5 +1,8 @@
 package github.muhsenerdev.users.api.application.registration;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -11,6 +14,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @SuperBuilder
 @Schema(description = "Base command for user registration")
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public abstract class RegisterUserBaseCommand {
 
     @NotBlank(message = "registration.email.required")

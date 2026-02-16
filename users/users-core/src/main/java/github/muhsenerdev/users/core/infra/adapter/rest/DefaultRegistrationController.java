@@ -1,4 +1,4 @@
-package github.muhsenerdev.users.core.infra.rest;
+package github.muhsenerdev.users.core.infra.adapter.rest;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

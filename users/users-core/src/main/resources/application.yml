@@ -10,10 +10,20 @@ spring:
 
 
 logging:
-  level: 
+  level:
     github.muhsenerdev: TRACE
 
 app:
   users:
     watchdog:
       registration-cleanup-interval: 2m
+  security:
+    jwt:
+      secret: "default_secret_key_at_least_32_chars_long_!!"
+      expiration: 3600000
+    access-token:
+      cookie:
+        name: access_token
+        http-only: true
+        secure: false
+        path: /

@@ -39,5 +39,7 @@ public interface UserMapper {
     @Mapping(target = "roles", expression = "java(user.getRoles().stream().map(r -> r.getName().getValue()).collect(java.util.stream.Collectors.toSet()))")
     EmailVerifiedEvent toEmailVerifiedEvent(User user);
 
+
+
     CodeResendResponse toCodeResendResponse(EmailVerification emailVerification);
 }

@@ -25,4 +25,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     @Query("SELECT u FROM User u WHERE u.emailVerification.status = 'VERIFYING' AND u.emailVerification.expiresAt < :now")
     List<User> findExpiredRegistrations(@Param("now") OffsetDateTime now);
 
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.roles WHERE u.email = :email")
+    Optional<User> findWithRolesByEmail(@Param("email") Email email);
+
 }

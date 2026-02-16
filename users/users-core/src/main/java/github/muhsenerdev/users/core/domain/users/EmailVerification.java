@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class EmailVerification {
 
-    private static final Duration EXPIRATION_DURATION = Duration.ofSeconds(30);
+    private static final Duration EXPIRATION_DURATION = Duration.ofHours(24);
     private static final Duration FIRST_RESEND_COOLDOWN_DURATION = Duration.ofSeconds(30);
 
     @Column(name = "verification_code")

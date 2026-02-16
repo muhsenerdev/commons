@@ -12,6 +12,7 @@ public class Name extends SingleVO<String> {
 
     private Name(String value) {
         validate(value);
+        this.name = value;
     }
 
     @Builder
@@ -26,7 +27,7 @@ public class Name extends SingleVO<String> {
     }
 
     @Override
-    protected String getValue() {
+    public String getValue() {
         return this.name;
     }
 }

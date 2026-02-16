@@ -1,6 +1,6 @@
 package github.muhsenerdev.commons.jpa.entity;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -24,9 +24,9 @@ public abstract class AuditableEntity {
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
-    private OffsetDateTime createdAt;
+    private Instant createdAt;
 
     @LastModifiedDate
     @Column(name = "updated_at")
-    private OffsetDateTime updatedAt;
+    private Instant updatedAt;
 }

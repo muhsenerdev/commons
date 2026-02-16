@@ -12,6 +12,7 @@ public class Email extends SingleVO<String> {
     private String email;
 
     private Email(String value) {
+        this.email = value;
         validate(value);
     }
 
@@ -27,7 +28,7 @@ public class Email extends SingleVO<String> {
     }
 
     @Override
-    protected String getValue() {
+    public String getValue() {
         return this.email;
     }
 }

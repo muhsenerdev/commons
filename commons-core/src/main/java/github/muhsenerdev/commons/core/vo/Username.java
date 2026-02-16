@@ -16,6 +16,7 @@ public class Username extends SingleVO<String> {
 
     private Username(String value) {
         validate(value);
+        this.username = value;
     }
 
     @Builder()
@@ -31,7 +32,7 @@ public class Username extends SingleVO<String> {
     }
 
     @Override
-    protected String getValue() {
+    public String getValue() {
         return this.username;
     }
 }

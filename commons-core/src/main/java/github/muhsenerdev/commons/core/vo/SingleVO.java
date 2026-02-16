@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public abstract class SingleVO<T> {
 
-    protected abstract T getValue();
+    public abstract T getValue();
 
     @Override
     public boolean equals(Object o) {

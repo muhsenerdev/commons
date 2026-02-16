@@ -1,5 +1,6 @@
 package github.muhsenerdev.users.core.domain.users;
 
+import java.util.Map;
 import java.util.Set;
 
 import github.muhsenerdev.commons.core.exception.InvalidDomainException;
@@ -13,11 +14,12 @@ public record UserCreationInput(
         String password,
         Set<Role> roles,
         RegistrationType registrationType,
-        boolean verified) {
+        boolean verified,
+        Map<String, Object> metadata) {
 
     @Builder(toBuilder = true)
     public UserCreationInput(String name, String username, String email, String password, Set<Role> roles,
-            RegistrationType registrationType, boolean verified) {
+            RegistrationType registrationType, boolean verified, Map<String, Object> metadata) {
 
         if (registrationType == RegistrationType.PASSWORD && password == null) {
             throw new InvalidDomainException("In user creation input, password is required for password registration");
@@ -34,6 +36,7 @@ public record UserCreationInput(
         this.roles = roles;
         this.registrationType = registrationType;
         this.verified = verified;
+        this.metadata = metadata == null ? Map.of() : metadata;
     }
 
     public boolean isPasswordRegistration() {

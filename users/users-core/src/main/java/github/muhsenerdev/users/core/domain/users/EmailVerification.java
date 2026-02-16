@@ -59,6 +59,29 @@ public class EmailVerification {
                 .build();
     }
 
+    public void verify(String code) throws InvalidDomainException {
+        // Check it is verifying.
+        if (this.status != VerificationStatus.VERIFYING) {
+            throw new InvalidDomainException("registration.verification.not-verifying",
+                    "User is not in verifying status.");
+        }
+
+        // Check code is correct.
+        if (!this.code.equals(code)) {
+            throw new InvalidDomainException("registration.verification.invalid-code",
+                    "Invalid verification code.");
+        }
+
+        // Check it is not expired.
+        if (this.expiresAt.isBefore(OffsetDateTime.now())) {
+            throw new InvalidDomainException("registration.verification.expired",
+                    "Verification code has expired.");
+        }
+
+        this.status = VerificationStatus.VERIFIED;
+
+    }
+
     public EmailVerification resendCode() {
         if (this.status != VerificationStatus.VERIFYING) {
             throw new InvalidDomainException("registration.verification.not-verifying",

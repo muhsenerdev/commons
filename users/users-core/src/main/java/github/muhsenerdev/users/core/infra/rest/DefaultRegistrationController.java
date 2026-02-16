@@ -13,11 +13,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Registration", description = "User registration endpoint")
 public class DefaultRegistrationController extends BaseRegistrationController<DefaultRegistrationCommand> {
 
-    private final RegistrationApplicationService<DefaultRegistrationCommand> service;
-
     public DefaultRegistrationController(RegistrationApplicationService<DefaultRegistrationCommand> service) {
         super(service);
-        this.service = service;
+
     }
 
 }

@@ -9,6 +9,7 @@ import java.time.OffsetDateTime;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -72,5 +73,57 @@ public class EmailVerificationTest {
         assertThat(verification.getStatus()).isEqualTo(VerificationStatus.VERIFYING);
         assertThat(verification.getResendCount()).isEqualTo(1);
         assertThat(verification.getResendableAt()).isAfter(OffsetDateTime.now());
+    }
+
+    @Nested
+    @DisplayName("EmailVerification.verify() Tests")
+    class VerifyTests {
+
+        @Test
+        @DisplayName("Given not verifying verification, when verify, then throws exception")
+        void givenNotVerifyingVerification_whenVerify_thenThrowsException() {
+            verification = Instancio.of(EmailVerification.class)
+                    .set(field(EmailVerification::getStatus), VerificationStatus.VERIFIED)
+                    .create();
+
+            assertThatThrownBy(() -> verification.verify("123456"))
+                    .isInstanceOf(InvalidDomainException.class)
+                    .hasMessageContaining("not in verifying status");
+        }
+
+        @Test
+        @DisplayName("Given expired verification, when verify, then throws exception")
+        void givenExpiredVerification_whenVerify_thenThrowsException() {
+            verification = Instancio.of(EmailVerification.class)
+                    .set(field(EmailVerification::getStatus), VerificationStatus.VERIFYING)
+                    .set(field(EmailVerification::getExpiresAt), OffsetDateTime.now().minusSeconds(3))
+                    .create();
+
+            assertThatThrownBy(() -> verification.verify(verification.getCode()))
+                    .isInstanceOf(InvalidDomainException.class)
+                    .hasMessageContaining("expired");
+        }
+
+        @Test
+        @DisplayName("Given invalid code verification, when verify, then throws exception")
+        void givenInvalidCodeVerification_whenVerify_thenThrowsException() {
+            verification = Instancio.of(EmailVerification.class)
+                    .set(field(EmailVerification::getStatus), VerificationStatus.VERIFYING)
+                    .create();
+
+            assertThatThrownBy(() -> verification.verify("123456"))
+                    .isInstanceOf(InvalidDomainException.class)
+                    .hasMessageContaining("Invalid verification code");
+        }
+
+        @Test
+        @DisplayName("Given valid verification, when verify, then verify successfully")
+        void givenValidVerification_whenVerify_thenVerifySuccessfully() {
+            verification = EmailVerification.create();
+
+            verification.verify(verification.getCode());
+
+            assertThat(verification.getStatus()).isEqualTo(VerificationStatus.VERIFIED);
+        }
     }
 }

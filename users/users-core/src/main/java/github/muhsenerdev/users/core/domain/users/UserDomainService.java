@@ -60,7 +60,7 @@ public class UserDomainService {
         }
 
         var user = User.createPasswordUser(name, username, email, hashedPassword, input.roles(),
-                input.verified());
+                input.verified(), input.metadata());
 
         return user;
     }

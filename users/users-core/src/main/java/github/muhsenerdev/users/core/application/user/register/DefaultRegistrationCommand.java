@@ -1,5 +1,8 @@
 package github.muhsenerdev.users.core.application.user.register;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
@@ -35,6 +38,11 @@ public class DefaultRegistrationCommand extends RegisterUserBaseCommand {
     public DefaultRegistrationCommand withName(String name) {
         this.name = name;
         return this;
+    }
+
+    @Override
+    public Map<String, Object> fetchMetadata() {
+        return new HashMap<>();
     }
 
 }

@@ -90,32 +90,6 @@ public class User extends SoftDeletableEntity {
         this.roles = roles;
     }
 
-    public static User createPasswordUser(Name name, Username username, Email email, HashedPassword password,
-            Set<Role> roles, boolean verified) {
-
-        EmailVerification verification = EmailVerification.create();
-        UserStatus status = UserStatus.INACTIVE;
-
-        if (verified) {
-            verification = EmailVerification.verified();
-            status = UserStatus.ACTIVE;
-        }
-
-        var user = User.builder()
-                .name(name)
-                .username(username)
-                .email(email)
-                .password(password)
-                .roles(roles)
-                .registrationType(RegistrationType.PASSWORD)
-                .status(status)
-                .emailVerification(verification)
-                .build();
-
-        user.validate();
-        return user;
-    }
-
     private void validate() {
         // Ensure has email.
         if (email == null) {
@@ -162,8 +136,40 @@ public class User extends SoftDeletableEntity {
         this.emailVerification = this.emailVerification.resendCode();
     }
 
+    public void verifyEmail(String code) throws InvalidDomainException {
+        this.emailVerification.verify(code);
+        this.status = UserStatus.ACTIVE;
+    }
+
     protected void setRoles(Set<Role> newRoles) {
         this.roles = newRoles;
+    }
+
+    public static User createPasswordUser(Name name, Username username, Email email, HashedPassword password,
+            Set<Role> roles, boolean verified, Map<String, Object> metadata) {
+
+        EmailVerification verification = EmailVerification.create();
+        UserStatus status = UserStatus.INACTIVE;
+
+        if (verified) {
+            verification = EmailVerification.verified();
+            status = UserStatus.ACTIVE;
+        }
+
+        var user = User.builder()
+                .name(name)
+                .username(username)
+                .email(email)
+                .password(password)
+                .roles(roles)
+                .registrationType(RegistrationType.PASSWORD)
+                .status(status)
+                .emailVerification(verification)
+                .metadata(metadata)
+                .build();
+
+        user.validate();
+        return user;
     }
 
 }

@@ -16,4 +16,4 @@ logging:
 app:
   users:
     watchdog:
-      registration-cleanup-interval: 5m
+      registration-cleanup-interval: 2m

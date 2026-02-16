@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.lenient;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -74,6 +75,10 @@ public class RegistrationApplicationServiceIT {
 
     }
 
+    // =========================================
+    // =========== HAPPY PATH ==================
+    // =========================================
+
     @Test
     @DisplayName("Happy Path")
     void happyPath() {
@@ -95,6 +100,8 @@ public class RegistrationApplicationServiceIT {
         assertThat(verification.getExpiresAt()).isNotNull();
         assertThat(verification.getCode()).isNotBlank();
         assertThat(userFound.isVerifying()).isTrue();
+        assertThat(verification.getResendCount()).isZero();
+        assertThat(verification.getResendableAt()).isAfter(OffsetDateTime.now());
 
         // Assert: It is registered with password.
         assertThat(userFound.getRegistrationType()).isNotNull();

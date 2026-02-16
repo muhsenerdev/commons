@@ -22,6 +22,7 @@ import lombok.NoArgsConstructor;
 public class EmailVerification {
 
     private static final Duration EXPIRATION_DURATION = Duration.ofSeconds(30);
+    private static final Duration FIRST_RESEND_COOLDOWN_DURATION = Duration.ofSeconds(30);
 
     @Column(name = "verification_code")
     private String code;
@@ -45,7 +46,7 @@ public class EmailVerification {
                 .expiresAt(OffsetDateTime.now().plus(EXPIRATION_DURATION))
                 .status(VerificationStatus.VERIFYING)
                 .resendCount(0)
-                .resendableAt(OffsetDateTime.now())
+                .resendableAt(OffsetDateTime.now().plus(FIRST_RESEND_COOLDOWN_DURATION))
                 .build();
     }
 

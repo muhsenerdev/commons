@@ -32,7 +32,7 @@ logging:
 app:
   users:
     requirements:
-      username-required: true
+      username-required: false
       name-required: false
     watchdog:
       registration-cleanup-interval: 5m
@@ -46,3 +46,11 @@ app:
         http-only: true
         secure: false
         path: /
+    csrf:
+      cookie-name: XSRF-TOKEN
+      header-name: X-XSRF-TOKEN
+      http-only: false
+      secure: false
+      cookie-path: /
+      domain: localhost
+      same-site: Lax

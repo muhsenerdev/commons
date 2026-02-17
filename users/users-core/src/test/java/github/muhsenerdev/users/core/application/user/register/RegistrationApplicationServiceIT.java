@@ -37,14 +37,12 @@ import github.muhsenerdev.users.core.domain.users.UserRepository;
 import github.muhsenerdev.users.core.infra.config.UserModuleProperties;
 import lombok.extern.slf4j.Slf4j;
 
-@SuppressWarnings("unchecked")
 @SpringBootTest
 @Sql("classpath:schema.sql")
 @Slf4j
 public class RegistrationApplicationServiceIT {
 
     @Autowired
-    @SuppressWarnings("rawtypes")
     private UserApplicationService service;
 
     @MockitoBean

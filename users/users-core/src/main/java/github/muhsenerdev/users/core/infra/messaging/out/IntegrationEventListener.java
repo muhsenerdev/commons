@@ -9,10 +9,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
+import github.muhsenerdev.users.api.application.auth.PasswordResetRequestedIntegrationEvent;
 import github.muhsenerdev.users.api.application.registration.RegistrationCompletedEvent;
 import github.muhsenerdev.users.api.application.registration.UserRegisteredEvent;
 import github.muhsenerdev.users.api.application.registration.VerificationCodeResentEvent;
 import github.muhsenerdev.users.core.domain.users.CodeResent;
+import github.muhsenerdev.users.core.domain.users.PasswordResetRequested;
 import github.muhsenerdev.users.core.domain.users.UserActivatedEvent;
 import github.muhsenerdev.users.core.domain.users.UserCreated;
 import github.muhsenerdev.users.core.domain.users.UserRepository;
@@ -72,5 +74,18 @@ public class IntegrationEventListener {
             eventPublisher.publishEvent(completedEvent);
             log.info("VerificationCodeResentEvent published for user: {}", event.getUserId());
         }
-    };
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void onPasswordResetRequested(PasswordResetRequested event) {
+        log.debug("Listening to PasswordResetRequested domain event for user: {}", event.getUserId());
+
+        PasswordResetRequestedIntegrationEvent integrationEvent = mapper
+                .toPasswordResetRequestedIntegrationEvent(event);
+        if (integrationEvent != null) {
+            eventPublisher.publishEvent(integrationEvent);
+            log.info("PasswordResetRequestedIntegrationEvent published for user: {}", event.getUserId());
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package github.muhsenerdev.users.core.domain.users;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -279,12 +280,59 @@ public class User extends SoftDeletableEntity {
                 .build());
     }
 
-    public void assignNewPassword(HashedPassword newPassword) {
+    protected void assignNewPassword(HashedPassword newPassword) {
         if (newPassword == null) {
             throw new IllegalArgumentException("New password cannot be null");
         }
         this.password = newPassword;
         determineRegistrationType();
+    }
+
+    public void requestPasswordReset() {
+        if (!isActive()) {
+            throw new InvalidDomainException("User is not active.");
+        }
+
+        if (registrationType == RegistrationType.SOCIAL) {
+            throw new InvalidDomainException("Social login users cannot reset password.");
+        }
+
+        this.passwordReset = PasswordReset.create();
+
+        this.registerEvent(PasswordResetRequested.builder()
+                .userIdSupplier(this::getId)
+                .email(this.email.getValue())
+                .code(this.passwordReset.getCode())
+                .expiresAt(this.passwordReset.getExpiresAt())
+                .name(this.name != null ? this.name.getValue() : null)
+                .build());
+    }
+
+    public void completePasswordReset(String code, HashedPassword newPassword) {
+        if (this.passwordReset == null) {
+            throw new InvalidDomainException("No password reset requested.");
+        }
+
+        if (this.passwordReset.getStatus() != PasswordResetStatus.PENDING) {
+            throw new InvalidDomainException("Password reset is not in pending state.");
+        }
+
+        if (this.passwordReset.getExpiresAt().isBefore(OffsetDateTime.now())) {
+            throw new InvalidDomainException("Password reset code expired.");
+        }
+
+        if (!Objects.equals(this.passwordReset.getCode(), code)) {
+            throw new InvalidDomainException("Invalid password reset code.");
+        }
+
+        this.password = newPassword;
+        this.passwordReset = this.passwordReset.complete();
+        determineRegistrationType();
+
+        this.registerEvent(PasswordResetCompleted.builder()
+                .userIdSupplier(this::getId)
+                .email(this.email.getValue())
+                .build());
     }
 
     public boolean isActive() {

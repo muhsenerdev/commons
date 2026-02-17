@@ -2,6 +2,8 @@ package github.muhsenerdev.users.core.application.user.shared;
 
 import github.muhsenerdev.users.core.application.user.change_password.ChangePasswordCommand;
 import github.muhsenerdev.users.core.application.user.complete.CompleteRegistrationCommand;
+import github.muhsenerdev.users.core.application.user.password_reset.CompletePasswordResetCommand;
+import github.muhsenerdev.users.core.application.user.password_reset.RequestPasswordResetCommand;
 import github.muhsenerdev.users.core.application.user.register.RegisterUserCommand;
 import github.muhsenerdev.users.core.application.user.register.UserRegistrationResponse;
 import github.muhsenerdev.users.core.application.user.resend_code.CodeResendResponse;
@@ -11,14 +13,17 @@ import jakarta.validation.Valid;
 
 public interface UserApplicationService {
 
-    public UserRegistrationResponse registerUser(RegisterUserCommand command);
+    UserRegistrationResponse registerUser(@Valid RegisterUserCommand command);
 
-    public CodeResendResponse resendCode(ResendVerificationCodeCommand command);
+    CodeResendResponse resendCode(@Valid ResendVerificationCodeCommand command);
 
-    public void verifyEmail(VerifyEmailCommand command);
+    void verifyEmail(@Valid VerifyEmailCommand command);
 
-    public void completeRegistration(@Valid CompleteRegistrationCommand command);
+    void completeRegistration(@Valid CompleteRegistrationCommand command);
 
-    public void changePassword(@Valid ChangePasswordCommand command);
+    void changePassword(@Valid ChangePasswordCommand command);
 
+    void requestPasswordReset(@Valid RequestPasswordResetCommand command);
+
+    void completePasswordReset(@Valid CompletePasswordResetCommand command);
 }

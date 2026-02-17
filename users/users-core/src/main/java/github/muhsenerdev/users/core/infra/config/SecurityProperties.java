@@ -12,6 +12,18 @@ public class SecurityProperties {
 
     private AccessToken accessToken = new AccessToken();
     private Jwt jwt = new Jwt();
+    private Csrf csrf = new Csrf();
+
+    @Data
+    public static class Csrf {
+        private String cookieName = "XSRF-TOKEN";
+        private String headerName = "X-XSRF-TOKEN";
+        private boolean httpOnly = false;
+        private boolean secure = true;
+        private String cookiePath = "/";
+        private String domain = "localhost";
+        private String sameSite = "Lax";
+    }
 
     @Data
     public static class AccessToken {

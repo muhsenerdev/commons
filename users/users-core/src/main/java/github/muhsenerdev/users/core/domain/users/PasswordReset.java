@@ -34,4 +34,12 @@ public class PasswordReset {
                 .status(PasswordResetStatus.PENDING)
                 .build();
     }
+
+    public PasswordReset complete() {
+        return PasswordReset.builder()
+                .code(this.code)
+                .expiresAt(this.expiresAt)
+                .status(PasswordResetStatus.COMPLETED)
+                .build();
+    }
 }

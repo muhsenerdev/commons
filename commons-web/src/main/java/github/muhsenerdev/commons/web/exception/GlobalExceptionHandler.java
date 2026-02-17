@@ -1,6 +1,6 @@
 package github.muhsenerdev.commons.web.exception;
 
-import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,7 +39,7 @@ public class GlobalExceptionHandler {
         log.error("Resource not found: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(NotFoundResponse.builder()
-                        .timestamp(Instant.now())
+                        .timestamp(OffsetDateTime.now())
                         .path(request.getRequestURI())
                         .message(ex.getMessage())
                         .status(HttpStatus.NOT_FOUND.value())
@@ -52,7 +52,7 @@ public class GlobalExceptionHandler {
         log.error("Duplicate resource: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ConflictResponse.builder()
-                        .timestamp(Instant.now())
+                        .timestamp(OffsetDateTime.now())
                         .path(request.getRequestURI())
                         .message(ex.getMessage())
                         .status(HttpStatus.CONFLICT.value())
@@ -66,7 +66,7 @@ public class GlobalExceptionHandler {
         log.error("Authentication required: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(UnauthorizedResponse.builder()
-                        .timestamp(Instant.now())
+                        .timestamp(OffsetDateTime.now())
                         .path(request.getRequestURI())
                         .message(ex.getMessage())
                         .status(HttpStatus.UNAUTHORIZED.value())
@@ -79,7 +79,7 @@ public class GlobalExceptionHandler {
         log.error("No permission: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(ForbiddenResponse.builder()
-                        .timestamp(Instant.now())
+                        .timestamp(OffsetDateTime.now())
                         .path(request.getRequestURI())
                         .message(ex.getMessage())
                         .status(HttpStatus.FORBIDDEN.value())
@@ -92,7 +92,7 @@ public class GlobalExceptionHandler {
         log.error("Bad request: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(BadRequestResponse.builder()
-                        .timestamp(Instant.now())
+                        .timestamp(OffsetDateTime.now())
                         .path(request.getRequestURI())
                         .message(ex.getMessage())
                         .status(HttpStatus.BAD_REQUEST.value())
@@ -105,7 +105,7 @@ public class GlobalExceptionHandler {
         log.error("Internal error: {}", ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(InternalErrorResponse.builder()
-                        .timestamp(Instant.now())
+                        .timestamp(OffsetDateTime.now())
                         .path(request.getRequestURI())
                         .message("An internal error occurred.")
                         .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
@@ -124,7 +124,7 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(BadRequestResponse.builder()
-                        .timestamp(Instant.now())
+                        .timestamp(OffsetDateTime.now())
                         .path(request.getRequestURI())
                         .message("Validation failed")
                         .status(HttpStatus.BAD_REQUEST.value())
@@ -137,7 +137,7 @@ public class GlobalExceptionHandler {
         log.error("Unexpected error: {}", ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ErrorResponse.builder()
-                        .timestamp(Instant.now())
+                        .timestamp(OffsetDateTime.now())
                         .path(request.getRequestURI())
                         .message("An unexpected error occurred.")
                         .status(HttpStatus.INTERNAL_SERVER_ERROR.value())

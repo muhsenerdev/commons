@@ -6,6 +6,10 @@ import github.muhsenerdev.users.core.application.user.change_password.ChangePass
 import github.muhsenerdev.users.core.application.user.change_password.ChangePasswordCommandHandler;
 import github.muhsenerdev.users.core.application.user.complete.CompleteRegistrationCommand;
 import github.muhsenerdev.users.core.application.user.complete.CompleteRegistrationCommandHandler;
+import github.muhsenerdev.users.core.application.user.password_reset.CompletePasswordResetCommand;
+import github.muhsenerdev.users.core.application.user.password_reset.CompletePasswordResetCommandHandler;
+import github.muhsenerdev.users.core.application.user.password_reset.RequestPasswordResetCommand;
+import github.muhsenerdev.users.core.application.user.password_reset.RequestPasswordResetCommandHandler;
 import github.muhsenerdev.users.core.application.user.register.RegisterUserCommand;
 import github.muhsenerdev.users.core.application.user.register.RegisterUserCommandHandler;
 import github.muhsenerdev.users.core.application.user.register.UserRegistrationResponse;
@@ -26,6 +30,8 @@ public class UserApplicationServiceImpl implements UserApplicationService {
     private final VerifyEmailCommandHandler verifyEmail;
     private final CompleteRegistrationCommandHandler completeRegistration;
     private final ChangePasswordCommandHandler changePassword;
+    private final RequestPasswordResetCommandHandler requestPasswordReset;
+    private final CompletePasswordResetCommandHandler completePasswordReset;
 
     @Override
     public UserRegistrationResponse registerUser(RegisterUserCommand command) {
@@ -50,6 +56,16 @@ public class UserApplicationServiceImpl implements UserApplicationService {
     @Override
     public void changePassword(@Valid ChangePasswordCommand command) {
         changePassword.handle(command);
+    }
+
+    @Override
+    public void requestPasswordReset(@Valid RequestPasswordResetCommand command) {
+        requestPasswordReset.handle(command);
+    }
+
+    @Override
+    public void completePasswordReset(@Valid CompletePasswordResetCommand command) {
+        completePasswordReset.handle(command);
     }
 
 }

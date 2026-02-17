@@ -1,6 +1,6 @@
 package github.muhsenerdev.commons.web.response;
 
-import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.Map;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,7 +13,7 @@ import lombok.experimental.SuperBuilder;
 public class ErrorResponse {
 
     @Schema(description = "Error timestamp", example = "2024-03-20T10:00:00Z")
-    private final Instant timestamp;
+    private final OffsetDateTime timestamp;
 
     @Schema(description = "Requested API path", example = "/api/v1/resource")
     private final String path;

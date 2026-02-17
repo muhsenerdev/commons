@@ -20,6 +20,13 @@ public class Name extends SingleVO<String> {
         return new Name(value);
     }
 
+    public static Name fromStringOrNull(String value) {
+        if (value == null) {
+            return null;
+        }
+        return of(value);
+    }
+
     private void validate(String value) {
         if (value == null || value.trim().length() < 3 || value.trim().length() > 100) {
             throw new InvalidDomainException("name.invalid", "Name must be between 3 and 100 characters.");

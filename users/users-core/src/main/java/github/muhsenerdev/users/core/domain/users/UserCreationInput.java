@@ -12,14 +12,18 @@ public record UserCreationInput(
         String username,
         String email,
         String password,
+        HashedPassword hashedPassword,
         Set<Role> roles,
         RegistrationType registrationType,
         boolean verified,
-        Map<String, Object> metadata) {
+        Map<String, Object> metadata,
+        Set<String> missingDetails,
+        SocialLoginDetails socialLoginDetails) {
 
     @Builder(toBuilder = true)
-    public UserCreationInput(String name, String username, String email, String password, Set<Role> roles,
-            RegistrationType registrationType, boolean verified, Map<String, Object> metadata) {
+    public UserCreationInput(String name, String username, String email, String password, HashedPassword hashedPassword,
+            Set<Role> roles, RegistrationType registrationType, boolean verified, Map<String, Object> metadata,
+            Set<String> missingDetails, SocialLoginDetails socialLoginDetails) {
 
         if (registrationType == RegistrationType.PASSWORD && password == null) {
             throw new InvalidDomainException("In user creation input, password is required for password registration");
@@ -37,6 +41,9 @@ public record UserCreationInput(
         this.registrationType = registrationType;
         this.verified = verified;
         this.metadata = metadata == null ? Map.of() : metadata;
+        this.missingDetails = missingDetails == null ? Set.of() : missingDetails;
+        this.socialLoginDetails = socialLoginDetails;
+        this.hashedPassword = hashedPassword;
     }
 
     public boolean isPasswordRegistration() {

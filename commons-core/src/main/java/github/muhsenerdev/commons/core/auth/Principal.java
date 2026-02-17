@@ -15,4 +15,10 @@ public interface Principal {
 
     Set<String> getRoles();
 
+    Set<String> getMissingDetails();
+
+    boolean isActive();
+
+    String getStatus();
+
 }

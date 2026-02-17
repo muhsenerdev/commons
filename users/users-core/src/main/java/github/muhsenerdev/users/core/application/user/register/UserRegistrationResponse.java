@@ -1,4 +1,4 @@
-package github.muhsenerdev.users.api.application.registration;
+package github.muhsenerdev.users.core.application.user.register;
 
 import java.util.UUID;
 

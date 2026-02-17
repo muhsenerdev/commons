@@ -1,4 +1,19 @@
+server:
+  servlet:
+    context-path: /api/v1
+
 spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_OAUTH_CLIENT_ID:default-client-id}
+            client-secret: ${GOOGLE_OAUTH_CLIENT_SECRET:default-client-secret}
+            scope:
+              - openid
+              - profile
+              - email
   jpa:
     defer-datasource-initialization: true
     hibernate:
@@ -12,11 +27,15 @@ spring:
 logging:
   level:
     github.muhsenerdev: TRACE
+    org.springframework.security: DEBUG
 
 app:
   users:
+    requirements:
+      username-required: true
+      name-required: false
     watchdog:
-      registration-cleanup-interval: 2m
+      registration-cleanup-interval: 5m
   security:
     jwt:
       secret: "default_secret_key_at_least_32_chars_long_!!"

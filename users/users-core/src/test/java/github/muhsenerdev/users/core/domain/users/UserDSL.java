@@ -6,9 +6,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import github.muhsenerdev.commons.core.vo.Email;
-import github.muhsenerdev.commons.core.vo.Name;
-import github.muhsenerdev.commons.core.vo.Username;
 import github.muhsenerdev.users.core.domain.roles.Role;
 import github.muhsenerdev.users.core.domain.roles.RoleRepository;
 
@@ -22,19 +19,16 @@ public class UserDSL {
     }
 
     public User build() {
-        Username username = null;
-        if (this.username != null) {
-            username = Username.of(this.username);
-        }
 
-        Name name = null;
-        if (this.name != null) {
-            name = Name.of(this.name);
-        }
-
-        var user = User.createPasswordUser(name, username, Email.of(UUID.randomUUID().toString() + "@gmail.com"),
-                HashedPassword.of("hashed-password"),
-                Set.of(Role.createUserRole()), false, Map.of());
+        var user = User.createPasswordUser(UserCreationInput.builder()
+                .name(this.name)
+                .username(this.username)
+                .email(UUID.randomUUID().toString() + "@gmail.com")
+                .password("hashed-password")
+                .roles(Set.of(Role.createUserRole()))
+                .verified(false)
+                .metadata(Map.of())
+                .build());
 
         return user;
     }

@@ -6,7 +6,8 @@ import lombok.Getter;
 @Getter
 public enum RegistrationType {
     PASSWORD,
-    SOCIAL;
+    SOCIAL,
+    HYBRID;
 
     public static RegistrationType fromString(String value) {
         RegistrationType type = fromStringOrNull(value);

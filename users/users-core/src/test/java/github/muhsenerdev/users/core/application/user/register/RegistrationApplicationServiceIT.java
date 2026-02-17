@@ -28,7 +28,7 @@ import github.muhsenerdev.commons.core.exception.DomainException;
 import github.muhsenerdev.commons.core.exception.InvalidDomainException;
 import github.muhsenerdev.commons.core.vo.Email;
 import github.muhsenerdev.commons.core.vo.Username;
-import github.muhsenerdev.users.api.application.registration.RegistrationApplicationService;
+import github.muhsenerdev.users.core.application.user.shared.UserApplicationService;
 import github.muhsenerdev.users.core.domain.roles.RoleRepository;
 import github.muhsenerdev.users.core.domain.users.RegistrationType;
 import github.muhsenerdev.users.core.domain.users.User;
@@ -45,7 +45,7 @@ public class RegistrationApplicationServiceIT {
 
     @Autowired
     @SuppressWarnings("rawtypes")
-    private RegistrationApplicationService service;
+    private UserApplicationService service;
 
     @MockitoBean
     private UserModuleProperties properties;
@@ -62,11 +62,11 @@ public class RegistrationApplicationServiceIT {
             .withUsername("test")
             .withPassword("test");
 
-    private DefaultRegistrationCommand command;
+    private RegisterUserCommand command;
 
     @BeforeEach
     void setUp() {
-        command = DefaultRegistrationCommand.builder()
+        command = RegisterUserCommand.builder()
                 .email(UUID.randomUUID().toString() + "@gmail.com")
                 .password("password").build();
 
@@ -84,7 +84,7 @@ public class RegistrationApplicationServiceIT {
     void happyPath() {
 
         // ACT
-        var response = service.register(command);
+        var response = service.registerUser(command);
 
         // ASSERT
         UUID userId = response.getId();
@@ -112,10 +112,10 @@ public class RegistrationApplicationServiceIT {
     @DisplayName("User Already Exists")
     void usersAlreadyExists_thenThrowsDomainException() {
         // ARRANGE: Register a user
-        service.register(command);
+        service.registerUser(command);
 
         // ACT & ASSERT
-        assertThatThrownBy(() -> service.register(command))
+        assertThatThrownBy(() -> service.registerUser(command))
                 .isInstanceOf(DomainException.class)
                 .hasMessageContaining("Email is already taken");
     }
@@ -130,7 +130,7 @@ public class RegistrationApplicationServiceIT {
         command = command.withEmail(user.getEmail().getValue());
 
         // ACT
-        service.register(command);
+        service.registerUser(command);
 
         // ASSERT
         Optional<User> userOptional = userRepository.findByEmail(user.getEmail());
@@ -159,7 +159,7 @@ public class RegistrationApplicationServiceIT {
 
                         try {
                             startLatch.await();
-                            service.register(command);
+                            service.registerUser(command);
                         } catch (Throwable throwable) {
                             errors.add(throwable);
                         } finally {
@@ -206,7 +206,7 @@ public class RegistrationApplicationServiceIT {
 
                         try {
                             startLatch.await();
-                            service.register(DefaultRegistrationCommand.builder()
+                            service.registerUser(RegisterUserCommand.builder()
                                     .email(UUID.randomUUID() + "@gmail.com")
                                     .username("sameUsername")
                                     .password(command.getPassword())
@@ -245,7 +245,7 @@ public class RegistrationApplicationServiceIT {
         lenient().when(properties.isUsernameRequired()).thenReturn(true);
 
         // ACT & ASSERT
-        assertThatThrownBy(() -> service.register(command))
+        assertThatThrownBy(() -> service.registerUser(command))
                 .isInstanceOf(InvalidDomainException.class)
                 .hasFieldOrPropertyWithValue("code", "username.invalid");
     }
@@ -257,7 +257,7 @@ public class RegistrationApplicationServiceIT {
         lenient().when(properties.isNameRequired()).thenReturn(true);
 
         // ACT & ASSERT
-        assertThatThrownBy(() -> service.register(command))
+        assertThatThrownBy(() -> service.registerUser(command))
                 .isInstanceOf(InvalidDomainException.class)
                 .hasFieldOrPropertyWithValue("code", "name.invalid");
     }
@@ -273,7 +273,7 @@ public class RegistrationApplicationServiceIT {
         command = command.withUsername(user.getUsername().getValue());
 
         // ACT & ASSERT
-        assertThatThrownBy(() -> service.register(command))
+        assertThatThrownBy(() -> service.registerUser(command))
                 .isInstanceOf(DomainException.class)
                 .hasMessageContaining("Username is already taken");
     }

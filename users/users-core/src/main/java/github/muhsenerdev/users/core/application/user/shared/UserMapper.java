@@ -6,40 +6,32 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import github.muhsenerdev.commons.core.vo.CommonVoMapper;
-import github.muhsenerdev.users.api.application.registration.EmailVerifiedEvent;
-import github.muhsenerdev.users.api.application.registration.RegisterUserBaseCommand;
-import github.muhsenerdev.users.api.application.registration.UserRegisteredEvent;
-import github.muhsenerdev.users.api.application.registration.VerificationCodeResentEvent;
+import github.muhsenerdev.users.api.application.auth.OidcUserDetails;
+import github.muhsenerdev.users.core.application.user.register.RegisterUserCommand;
 import github.muhsenerdev.users.core.application.user.resend_code.CodeResendResponse;
 import github.muhsenerdev.users.core.domain.roles.Role;
 import github.muhsenerdev.users.core.domain.users.EmailVerification;
 import github.muhsenerdev.users.core.domain.users.RegistrationType;
+import github.muhsenerdev.users.core.domain.users.SocialLoginDetails;
 import github.muhsenerdev.users.core.domain.users.User;
 import github.muhsenerdev.users.core.domain.users.UserCreationInput;
 
-@Mapper(componentModel = "spring", uses = { CommonVoMapper.class })
+@Mapper(componentModel = "spring", uses = { CommonVoMapper.class, UserModuleVoMapper.class })
 public interface UserMapper {
 
-    @Mapping(target = "metadata", expression = "java(command.fetchMetadata())")
-    UserCreationInput toCreationInput(RegisterUserBaseCommand command, RegistrationType registrationType,
+    @Mapping(target = "metadata", source = "command.otherDetails")
+    @Mapping(target = "hashedPassword", ignore = true)
+    @Mapping(target = "missingDetails", ignore = true)
+    @Mapping(target = "socialLoginDetails", ignore = true)
+    UserCreationInput toCreationInput(RegisterUserCommand command, RegistrationType registrationType,
             Set<Role> roles,
             boolean verified);
 
     @Mapping(target = "userId", source = "id")
-    @Mapping(target = "verificationExpiresAt", source = "emailVerification.expiresAt")
-    @Mapping(target = "verificationCode", source = "emailVerification.code")
-    UserRegisteredEvent toUserRegisteredEvent(User user);
-
-    @Mapping(target = "userId", source = "id")
-    @Mapping(target = "verificationExpiresAt", source = "emailVerification.expiresAt")
-    @Mapping(target = "verificationCode", source = "emailVerification.code")
-    VerificationCodeResentEvent toVerificationCodeResentEvent(User user);
-
-    @Mapping(target = "userId", source = "id")
-    @Mapping(target = "roles", expression = "java(user.getRoles().stream().map(r -> r.getName().getValue()).collect(java.util.stream.Collectors.toSet()))")
-    EmailVerifiedEvent toEmailVerifiedEvent(User user);
-
-
+    @Mapping(target = "roles", expression = "java(user.getRoles().stream().map(r -> r.getName()).collect(java.util.stream.Collectors.toSet()))")
+    UserInfo toUserInfo(User user);
 
     CodeResendResponse toCodeResendResponse(EmailVerification emailVerification);
+
+    SocialLoginDetails extractSocialLoginDetails(OidcUserDetails userDetails);
 }

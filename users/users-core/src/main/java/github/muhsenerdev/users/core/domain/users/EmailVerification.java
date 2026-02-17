@@ -82,7 +82,13 @@ public class EmailVerification {
 
     }
 
-    public EmailVerification resendCode() {
+    /**
+     * Returns newly created email verification.
+     * 
+     * @return
+     * @throws InvalidDomainException
+     */
+    public EmailVerification resendCode() throws InvalidDomainException {
         if (this.status != VerificationStatus.VERIFYING) {
             throw new InvalidDomainException("registration.verification.not-verifying",
                     "User is not in verifying status.");
@@ -122,5 +128,13 @@ public class EmailVerification {
 
     public boolean isVerifying() {
         return this.status == VerificationStatus.VERIFYING;
+    }
+
+    protected void markAsVerified() {
+        this.status = VerificationStatus.VERIFIED;
+    }
+
+    public boolean isVerified() {
+        return this.status == VerificationStatus.VERIFIED;
     }
 }

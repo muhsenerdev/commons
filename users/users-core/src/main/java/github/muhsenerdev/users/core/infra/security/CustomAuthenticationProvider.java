@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import github.muhsenerdev.commons.core.auth.Principal;
 import github.muhsenerdev.commons.core.vo.Email;
 import github.muhsenerdev.users.core.application.auth.DefaultPrincipal;
+import github.muhsenerdev.users.core.domain.roles.Role;
 import github.muhsenerdev.users.core.domain.users.User;
 import github.muhsenerdev.users.core.domain.users.UserRepository;
 import github.muhsenerdev.users.core.domain.users.UserStatus;
@@ -63,7 +64,9 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
                 .email(user.getEmail())
                 .username(user.getUsername())
                 .name(user.getName())
-                .roles(user.getRoles())
+                .roles(user.getRoles().stream().map(Role::getName).collect(Collectors.toSet()))
+                .missingDetails(user.getMissingDetails())
+                .status(user.getStatus())
                 .build();
     }
 }

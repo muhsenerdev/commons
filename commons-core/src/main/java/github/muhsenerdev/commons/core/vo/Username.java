@@ -35,4 +35,11 @@ public class Username extends SingleVO<String> {
     public String getValue() {
         return this.username;
     }
+
+    public static Username fromStringOrNull(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        return of(value);
+    }
 }

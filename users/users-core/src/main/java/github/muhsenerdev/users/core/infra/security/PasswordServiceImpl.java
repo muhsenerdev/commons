@@ -1,4 +1,4 @@
-package github.muhsenerdev.users.core.infra.adapter;
+package github.muhsenerdev.users.core.infra.security;
 
 import org.passay.PasswordData;
 import org.passay.PasswordValidator;
@@ -29,6 +29,12 @@ public class PasswordServiceImpl implements PasswordService {
         }
     }
 
+    private void checkInput(HashedPassword input) {
+        if (input == null) {
+            throw new IllegalArgumentException("hashedPassword cannot be null");
+        }
+    }
+
     @Override
     public void validate(String rawPassworrd) throws PasswordException {
         checkInput(rawPassworrd);
@@ -38,6 +44,13 @@ public class PasswordServiceImpl implements PasswordService {
             return;
         }
         throw new PasswordException("Invalid password");
+    }
+
+    @Override
+    public boolean matches(String rawPassword, HashedPassword hashedPassword) {
+        checkInput(rawPassword);
+        checkInput(hashedPassword);
+        return passwordEncoder.matches(rawPassword, hashedPassword.getValue());
     }
 
 }

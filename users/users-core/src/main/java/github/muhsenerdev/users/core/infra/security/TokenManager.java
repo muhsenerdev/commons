@@ -29,4 +29,13 @@ public class TokenManager {
                 .signWith(key)
                 .compact();
     }
+
+    public io.jsonwebtoken.Claims verifyToken(String token) {
+        SecretKey key = Keys.hmacShaKeyFor(securityProperties.getJwt().getSecret().getBytes());
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
 }

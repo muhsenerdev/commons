@@ -10,7 +10,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class EmailVerifiedEvent extends BaseEvent {
+public class RegistrationCompletedEvent extends BaseEvent {
 
     private UUID userId;
     private String email;

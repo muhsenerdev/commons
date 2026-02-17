@@ -59,10 +59,36 @@ public class UserDomainService {
             throw new InvalidDomainException("Email is already taken: " + input.email());
         }
 
-        var user = User.createPasswordUser(name, username, email, hashedPassword, input.roles(),
-                input.verified(), input.metadata());
+        var user = User.createPasswordUser(input.toBuilder().hashedPassword(hashedPassword).build());
 
         return user;
+    }
+
+    public void changePassword(User user, String newPassword, String oldPassword, boolean adminChanges) {
+        if (adminChanges) {
+            passwordService.validate(newPassword);
+            var hashedPassword = passwordService.hash(newPassword);
+            user.assignNewPassword(hashedPassword);
+        } else {
+            // User self change password.
+            // 1. Check registration type.
+            var type = user.getRegistrationType();
+            if (type != RegistrationType.PASSWORD && type != RegistrationType.HYBRID) {
+                throw new InvalidDomainException("User is not a password-enabled user.");
+            }
+
+            // 2. Check old password.
+            if (!passwordService.matches(oldPassword, user.getPassword())) {
+                throw new InvalidDomainException("Old password does not match.");
+            }
+
+            // 3. Validate and hash new password.
+            passwordService.validate(newPassword);
+            var hashedPassword = passwordService.hash(newPassword);
+
+            // 4. Assign new password.
+            user.assignNewPassword(hashedPassword);
+        }
     }
 
 }

@@ -7,8 +7,9 @@ import java.util.stream.Collectors;
 import github.muhsenerdev.commons.core.auth.Principal;
 import github.muhsenerdev.commons.core.vo.Email;
 import github.muhsenerdev.commons.core.vo.Name;
+import github.muhsenerdev.commons.core.vo.RoleName;
 import github.muhsenerdev.commons.core.vo.Username;
-import github.muhsenerdev.users.core.domain.roles.Role;
+import github.muhsenerdev.users.core.domain.users.UserStatus;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -20,7 +21,9 @@ public class DefaultPrincipal implements Principal {
     private final Email email;
     private final Username username;
     private final Name name;
-    private final Set<Role> roles;
+    private final Set<RoleName> roles;
+    private final Set<String> missingDetails;
+    private final UserStatus status;
 
     @Override
     public UUID getUserId() {
@@ -45,7 +48,22 @@ public class DefaultPrincipal implements Principal {
     @Override
     public Set<String> getRoles() {
         return roles != null ? roles.stream()
-                .map(r -> r.getName().getValue())
+                .map(RoleName::getValue)
                 .collect(Collectors.toSet()) : Set.of();
+    }
+
+    @Override
+    public Set<String> getMissingDetails() {
+        return missingDetails != null ? missingDetails : Set.of();
+    }
+
+    @Override
+    public boolean isActive() {
+        return status == UserStatus.ACTIVE;
+    }
+
+    @Override
+    public String getStatus() {
+        return status.name();
     }
 }

@@ -15,7 +15,7 @@ public class VerificationCodeResentEvent extends BaseEvent {
     private String email;
     private String name;
 
-    private OffsetDateTime verificationExpiresAt;
-    private String verificationCode;
+    private OffsetDateTime expiresAt;
+    private String newCode;
 
 }

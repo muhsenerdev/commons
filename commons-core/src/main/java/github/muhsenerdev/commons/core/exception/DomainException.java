@@ -9,4 +9,8 @@ public abstract class DomainException extends BaseException {
     public DomainException(String code, String message) {
         super(code, message);
     }
+
+    public DomainException(String code, String message, Object... args) {
+        super(code, message, args);
+    }
 }

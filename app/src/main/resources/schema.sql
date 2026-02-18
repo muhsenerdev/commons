@@ -1,0 +1,15 @@
+CREATE UNIQUE INDEX IF NOT EXISTS idx_u_users_email_non_deleted
+ON users(email) 
+WHERE deleted_at IS NULL;
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_u_users_username_non_deleted 
+ON users(username) 
+WHERE deleted_at IS NULL;
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_u_plan_tier_not_deleted
+ON plans (tier)
+WHERE deleted_at IS NULL;
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_u_plan_code_not_deleted
+ON plans (code)
+WHERE deleted_at IS NULL;

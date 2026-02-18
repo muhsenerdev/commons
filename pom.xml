@@ -114,6 +114,11 @@
                 <artifactId>plan-management</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>github.muhsenerdev</groupId>
+                <artifactId>app</artifactId>
+                <version>${project.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -199,6 +204,7 @@
         <module>commons-web</module>
         <module>users</module>
         <module>plan-management</module>
+        <module>app</module>
     </modules>
 
 </project>

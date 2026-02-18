@@ -1,23 +1,24 @@
-package github.muhsenerdev.users.core;
+package github.muhsenerdev.app;
 
 import java.util.List;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.testcontainers.containers.PostgreSQLContainer;
 
-@SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
-@EnableJpaAuditing
+@SpringBootApplication(scanBasePackages = "github.muhsenerdev")
 @EnableAsync
 @EnableScheduling
-@ComponentScan(basePackages = { "github.muhsenerdev" })
+@EnableJpaAuditing
+@EnableJpaRepositories(basePackages = "github.muhsenerdev")
+@EntityScan(basePackages = "github.muhsenerdev")
 public class Entrypoint {
 
     public static void main(String[] args) {
@@ -28,7 +29,7 @@ public class Entrypoint {
     @Bean
     public PostgreSQLContainer<?> postgresqlContainer() {
         var container = new PostgreSQLContainer<>("postgres:17")
-                .withDatabaseName("users-test")
+                .withDatabaseName("platform-db")
                 .withUsername("postgres")
                 .withPassword("postgres");
 

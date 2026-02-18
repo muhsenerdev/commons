@@ -20,7 +20,7 @@ public class AddPlanFeatureCommandHandler {
     private final PlanRepository planRepository;
 
     @Transactional
-    public void handle(AddPlanFeatureCommand command) {
+    public AddPlanFeatureResponse handle(AddPlanFeatureCommand command) {
         Plan plan = planService.findWithFeaturesOrThrow(command.getPlanId());
         Feature feature = featureRepository.findById(command.getFeatureId())
                 .orElseThrow(() -> new NotFoundException("feature.not_found",
@@ -28,5 +28,7 @@ public class AddPlanFeatureCommandHandler {
 
         plan.features().add(feature, command.getValue());
         planRepository.save(plan);
+        return AddPlanFeatureResponse.builder().planFeatureId(plan.getFeatures().stream().findAny().get().getId())
+                .build();
     }
 }

@@ -8,6 +8,7 @@ import github.muhsenerdev.plans.application.plan.create.CreatePlanCommandHandler
 import github.muhsenerdev.plans.application.plan.create.PlanCreationResponse;
 import github.muhsenerdev.plans.application.plan.feature.add.AddPlanFeatureCommand;
 import github.muhsenerdev.plans.application.plan.feature.add.AddPlanFeatureCommandHandler;
+import github.muhsenerdev.plans.application.plan.feature.add.AddPlanFeatureResponse;
 import github.muhsenerdev.plans.application.plan.feature.archive.DeletePlanFeatureCommand;
 import github.muhsenerdev.plans.application.plan.feature.archive.DeletePlanFeatureCommandHandler;
 import github.muhsenerdev.plans.application.plan.feature.update_value.UpdatePlanFeatureValueCommand;
@@ -63,8 +64,8 @@ public class PlanApplicationServiceImpl implements PlanApplicationService {
     }
 
     @Override
-    public void addFeature(AddPlanFeatureCommand command) {
-        addPlanFeatureCommandHandler.handle(command);
+    public AddPlanFeatureResponse addFeature(AddPlanFeatureCommand command) {
+        return addPlanFeatureCommandHandler.handle(command);
     }
 
     @Override

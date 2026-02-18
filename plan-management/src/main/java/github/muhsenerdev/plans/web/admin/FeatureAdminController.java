@@ -21,7 +21,7 @@ public class FeatureAdminController {
 
     private final FeatureRepository featureRepository;
 
-    @GetMapping("/list")
+    @GetMapping()
     @Operation(summary = "List all core features", description = "Returns a list of all available features in the system")
     public List<FeatureResponse> listFeatures() {
         return featureRepository.findAll().stream()

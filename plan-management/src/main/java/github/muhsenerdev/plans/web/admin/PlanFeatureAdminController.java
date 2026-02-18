@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import github.muhsenerdev.plans.application.plan.feature.add.AddPlanFeatureCommand;
+import github.muhsenerdev.plans.application.plan.feature.add.AddPlanFeatureResponse;
 import github.muhsenerdev.plans.application.plan.feature.archive.DeletePlanFeatureCommand;
 import github.muhsenerdev.plans.application.plan.feature.update_value.UpdatePlanFeatureValueCommand;
 import github.muhsenerdev.plans.application.plan.shared.PlanApplicationService;
@@ -27,11 +28,12 @@ public class PlanFeatureAdminController {
 
     private final PlanApplicationService planApplicationService;
 
-    @PostMapping("/add")
+    @PostMapping("")
     @Operation(summary = "Add a feature to a plan", description = "Adds a global feature to the specified plan with a value")
-    public void addFeature(@PathVariable UUID planId, @Valid @RequestBody AddPlanFeatureCommand command) {
+    public AddPlanFeatureResponse addFeature(@PathVariable UUID planId,
+            @Valid @RequestBody AddPlanFeatureCommand command) {
         command.setPlanId(planId);
-        planApplicationService.addFeature(command);
+        return planApplicationService.addFeature(command);
     }
 
     @DeleteMapping("/{planFeatureId}")
@@ -44,7 +46,7 @@ public class PlanFeatureAdminController {
         planApplicationService.deleteFeature(command);
     }
 
-    @PatchMapping("/{planFeatureId}/update-value")
+    @PatchMapping("/{planFeatureId}")
     @Operation(summary = "Update plan feature value", description = "Updates the value of a feature in a plan")
     public void updateFeatureValue(@PathVariable UUID planId, @PathVariable UUID planFeatureId,
             @Valid @RequestBody UpdatePlanFeatureValueCommand command) {

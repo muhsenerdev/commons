@@ -6,6 +6,14 @@ import org.springframework.validation.annotation.Validated;
 import github.muhsenerdev.plans.application.plan.create.CreatePlanCommand;
 import github.muhsenerdev.plans.application.plan.create.CreatePlanCommandHandler;
 import github.muhsenerdev.plans.application.plan.create.PlanCreationResponse;
+import github.muhsenerdev.plans.application.plan.feature.activate.ActivatePlanFeatureCommand;
+import github.muhsenerdev.plans.application.plan.feature.activate.ActivatePlanFeatureCommandHandler;
+import github.muhsenerdev.plans.application.plan.feature.add.AddPlanFeatureCommand;
+import github.muhsenerdev.plans.application.plan.feature.add.AddPlanFeatureCommandHandler;
+import github.muhsenerdev.plans.application.plan.feature.archive.ArchivePlanFeatureCommand;
+import github.muhsenerdev.plans.application.plan.feature.archive.ArchivePlanFeatureCommandHandler;
+import github.muhsenerdev.plans.application.plan.feature.update_value.UpdatePlanFeatureValueCommand;
+import github.muhsenerdev.plans.application.plan.feature.update_value.UpdatePlanFeatureValueCommandHandler;
 import github.muhsenerdev.plans.application.plan.price.add_price.AddPriceCommand;
 import github.muhsenerdev.plans.application.plan.price.add_price.AddPriceCommandHandler;
 import github.muhsenerdev.plans.application.plan.price.add_price.AddPriceResponse;
@@ -27,6 +35,10 @@ public class PlanApplicationServiceImpl implements PlanApplicationService {
     private final AddPriceCommandHandler addPriceCommandHandler;
     private final DeletePriceCommandHandler deletePriceCommandHandler;
     private final UpdatePriceCommandHandler updatePriceCommandHandler;
+    private final AddPlanFeatureCommandHandler addPlanFeatureCommandHandler;
+    private final ArchivePlanFeatureCommandHandler archivePlanFeatureCommandHandler;
+    private final UpdatePlanFeatureValueCommandHandler updatePlanFeatureValueCommandHandler;
+    private final ActivatePlanFeatureCommandHandler activatePlanFeatureCommandHandler;
 
     @Override
     public PlanCreationResponse createPlan(CreatePlanCommand command) {
@@ -51,5 +63,25 @@ public class PlanApplicationServiceImpl implements PlanApplicationService {
     @Override
     public void updatePrice(UpdatePriceCommand command) {
         updatePriceCommandHandler.handle(command);
+    }
+
+    @Override
+    public void addFeature(AddPlanFeatureCommand command) {
+        addPlanFeatureCommandHandler.handle(command);
+    }
+
+    @Override
+    public void archiveFeature(ArchivePlanFeatureCommand command) {
+        archivePlanFeatureCommandHandler.handle(command);
+    }
+
+    @Override
+    public void updateFeatureValue(UpdatePlanFeatureValueCommand command) {
+        updatePlanFeatureValueCommandHandler.handle(command);
+    }
+
+    @Override
+    public void activateFeature(ActivatePlanFeatureCommand command) {
+        activatePlanFeatureCommandHandler.handle(command);
     }
 }

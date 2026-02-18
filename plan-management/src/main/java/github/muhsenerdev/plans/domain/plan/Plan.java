@@ -79,6 +79,9 @@ public class Plan extends SoftDeletableEntity {
     @Transient
     private PriceFacade priceFacade = new PriceFacade(this);
 
+    @Transient
+    private FeatureFacade featureFacade = new FeatureFacade(this);
+
     @Builder
     public Plan(String code, String description, String title, String name, PlanType type, int tier) {
         this.code = code;
@@ -135,18 +138,18 @@ public class Plan extends SoftDeletableEntity {
 
     }
 
-    public PlanPrice addPrice(Money price, Interval interval) {
-        if (isFree()) {
-            throw PlanDomainException.priceCannotBeAddedToFreePlan(this.getId());
-        }
-        PlanPrice planPrice = PlanPrice.builder()
-                .plan(this)
-                .price(price)
-                .interval(interval)
-                .build();
-        this.prices.add(planPrice);
-        return planPrice;
-    }
+    // public PlanPrice addPrice(Money price, Interval interval) {
+    // if (isFree()) {
+    // throw PlanDomainException.priceCannotBeAddedToFreePlan(this.getId());
+    // }
+    // PlanPrice planPrice = PlanPrice.builder()
+    // .plan(this)
+    // .price(price)
+    // .interval(interval)
+    // .build();
+    // this.prices.add(planPrice);
+    // return planPrice;
+    // }
 
     public Optional<PlanPrice> getLastPrice() {
         return this.prices.isEmpty() ? Optional.empty() : Optional.of(this.prices.getLast());
@@ -260,14 +263,15 @@ public class Plan extends SoftDeletableEntity {
     // validate();
     // }
 
-    public void updatePrice(UUID priceId, Money price, Interval interval) {
-        PlanPrice planPrice = this.prices.stream()
-                .filter(p -> p.getId().equals(priceId))
-                .findFirst()
-                .orElseThrow(() -> new InvalidInputException("Plan price not found with id: " + priceId));
-        planPrice.update(price, interval);
+    // public void updatePrice(UUID priceId, Money price, Interval interval) {
+    // PlanPrice planPrice = this.prices.stream()
+    // .filter(p -> p.getId().equals(priceId))
+    // .findFirst()
+    // .orElseThrow(() -> new InvalidInputException("Plan price not found with id: "
+    // + priceId));
+    // planPrice.update(price, interval);
 
-    }
+    // }
 
     public void addFeature(Feature feature, String value) {
         if (feature == null) {
@@ -296,28 +300,6 @@ public class Plan extends SoftDeletableEntity {
 
     public Optional<PlanFeature> getLastFeature() {
         return this.features.isEmpty() ? Optional.empty() : Optional.of(this.features.getLast());
-    }
-
-    public void archiveFeature(UUID featureId) {
-        this.features.stream()
-                .filter(feature -> feature.getId().equals(featureId))
-                .forEach(feature -> feature.archive());
-        if (isActive() && !hasAnyActiveFeature()) {
-            throw PlanDomainException.featureCannotBeArchived("Plan must have at least one active feature");
-        }
-    }
-
-    public void updateFeatureValue(UUID featureId, String value) {
-        this.features.stream()
-                .filter(feature -> feature.getId().equals(featureId))
-                .findFirst()
-                .ifPresent(feature -> feature.setValue(value));
-    }
-
-    public void activateFeature(UUID featureId) {
-        this.features.stream()
-                .filter(feature -> feature.getId().equals(featureId))
-                .forEach(feature -> feature.activate());
     }
 
     private boolean hasAnyActiveFeature() {
@@ -401,6 +383,10 @@ public class Plan extends SoftDeletableEntity {
         return priceFacade;
     }
 
+    public FeatureFacade features() {
+        return featureFacade;
+    }
+
     private void ensurePriceUniquenessOn(Interval interval, PriceStatus status) {
         if (status == PriceStatus.ARCHIVED)
             return;
@@ -409,6 +395,28 @@ public class Plan extends SoftDeletableEntity {
             throw new PlanDomainException("plan.duplicate_price",
                     "Plan has already prices on the same interval: {} in status: {}", interval, status);
         }
+    }
+
+    private boolean hasPrice(Interval interval, PriceStatus draft) {
+        return this.prices.stream()
+                .filter(price -> price.getPriceInterval().equals(interval))
+                .filter(price -> price.getStatus().equals(draft))
+                .findFirst()
+                .isPresent();
+    }
+
+    private boolean hasFeature(Feature feature) {
+        return this.features.stream()
+                .filter(f -> f.getFeature().getId().equals(feature.getId()))
+                .findFirst()
+                .isPresent();
+    }
+
+    private PlanFeature getFeatureOrThrow(UUID featureId) {
+        return this.features.stream()
+                .filter(f -> f.getFeature().getId().equals(featureId))
+                .findFirst()
+                .orElseThrow(() -> PlanDomainException.featureNotFound(featureId));
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -475,11 +483,68 @@ public class Plan extends SoftDeletableEntity {
 
     }
 
-    private boolean hasPrice(Interval interval, PriceStatus draft) {
-        return this.prices.stream()
-                .filter(price -> price.getPriceInterval().equals(interval))
-                .filter(price -> price.getStatus().equals(draft))
-                .findFirst()
-                .isPresent();
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class FeatureFacade {
+        private Plan plan;
+
+        /**
+         * Adds a feature to the plan.
+         * 
+         * @param feature The feature to add.
+         * @param value   The value of the feature.
+         * @throws PlanDomainException If the feature already exists in the plan.
+         */
+        public void add(Feature feature, String value) throws PlanDomainException {
+            if (feature == null) {
+                throw new InvalidInputException("Feature cannot be null");
+            }
+
+            if (this.plan.hasFeature(feature)) {
+                throw PlanDomainException.duplicateFeature(feature.getCode());
+            }
+
+            PlanFeature planFeature = PlanFeature.create(plan, feature, value);
+            this.plan.features.add(planFeature);
+        }
+
+        /**
+         * Archives a feature in the plan.
+         * 
+         * @param featureId The ID of the feature to archive.
+         * @throws PlanDomainException If the feature is not found or if the plan is
+         *                             active and has no other active features
+         */
+        public void archive(UUID featureId) throws PlanDomainException {
+            PlanFeature feature = plan.getFeatureOrThrow(featureId);
+            feature.archive();
+            if (plan.isActive() && !plan.hasAnyActiveFeature()) {
+                throw PlanDomainException.featureCannotBeArchived("Plan must have at least one active feature");
+            }
+        }
+
+        /**
+         * Updates the value of a feature in the plan.
+         * 
+         * @param featureId The ID of the feature to update.
+         * @param value     The new value for the feature.
+         * @throws PlanDomainException If the feature is not found.
+         */
+        public void updateValue(UUID featureId, String value) throws PlanDomainException {
+            PlanFeature feature = plan.getFeatureOrThrow(featureId);
+            feature.setValue(value);
+        }
+
+        /**
+         * Activates a feature in the plan.
+         * 
+         * @param featureId The ID of the feature to activate.
+         * @throws PlanDomainException If the feature is not found.
+         */
+        public void activate(UUID featureId) throws PlanDomainException {
+            PlanFeature feature = plan.getFeatureOrThrow(featureId);
+            feature.activate();
+        }
+
     }
 }

@@ -33,4 +33,12 @@ public class PlanService {
                         () -> new NotFoundException("plan.not_found", "Plan not found with id: " + id));
     }
 
+    @Transactional
+    public Plan findWithFeaturesOrThrow(UUID id) {
+        Assert.notNull(id, "PlanId cannot be null!");
+        return planRepository.findWithFeaturesDeeplyById(id)
+                .orElseThrow(
+                        () -> new NotFoundException("plan.not_found", "Plan not found with id: " + id));
+    }
+
 }

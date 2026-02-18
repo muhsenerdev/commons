@@ -86,4 +86,8 @@ public class PlanDomainException extends DomainException {
         return new PlanDomainException("plan.price_not_found", "Plan price not found with id: {}", priceId);
     }
 
+    public static PlanDomainException featureNotFound(UUID featureId) {
+        return new PlanDomainException("plan.feature_not_found", "Plan feature not found with id: {}", featureId);
+    }
+
 }

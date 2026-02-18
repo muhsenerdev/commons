@@ -109,6 +109,11 @@
                 <artifactId>commons-validator</artifactId>
                 <version>${commons-validator.version}</version>
             </dependency>
+            <dependency>
+                <groupId>github.muhsenerdev</groupId>
+                <artifactId>plan-management</artifactId>
+                <version>${project.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -193,6 +198,7 @@
         <module>commons-jpa</module>
         <module>commons-web</module>
         <module>users</module>
+        <module>plan-management</module>
     </modules>
 
 </project>

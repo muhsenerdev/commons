@@ -1,0 +1,5 @@
+app:
+  users:
+    admin:
+      email: ${ADMIN_EMAIL:admin@admin.com}
+      password: ${ADMIN_PASSWORD:admin123}

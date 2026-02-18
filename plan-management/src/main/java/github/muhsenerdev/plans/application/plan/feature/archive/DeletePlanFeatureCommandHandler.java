@@ -1,4 +1,4 @@
-package github.muhsenerdev.plans.application.plan.feature.activate;
+package github.muhsenerdev.plans.application.plan.feature.archive;
 
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,16 +10,15 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class ActivatePlanFeatureCommandHandler {
+public class DeletePlanFeatureCommandHandler {
 
     private final PlanService planService;
     private final PlanRepository planRepository;
 
     @Transactional
-    public void handle(ActivatePlanFeatureCommand command) {
+    public void handle(DeletePlanFeatureCommand command) {
         Plan plan = planService.findWithFeaturesOrThrow(command.getPlanId());
-        plan.features().activate(command.getPlanFeatureId());
+        plan.features().delete(command.getPlanFeatureId());
         planRepository.save(plan);
-
     }
 }

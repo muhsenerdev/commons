@@ -2,9 +2,8 @@ package github.muhsenerdev.plans.application.plan.shared;
 
 import github.muhsenerdev.plans.application.plan.create.CreatePlanCommand;
 import github.muhsenerdev.plans.application.plan.create.PlanCreationResponse;
-import github.muhsenerdev.plans.application.plan.feature.activate.ActivatePlanFeatureCommand;
 import github.muhsenerdev.plans.application.plan.feature.add.AddPlanFeatureCommand;
-import github.muhsenerdev.plans.application.plan.feature.archive.ArchivePlanFeatureCommand;
+import github.muhsenerdev.plans.application.plan.feature.archive.DeletePlanFeatureCommand;
 import github.muhsenerdev.plans.application.plan.feature.update_value.UpdatePlanFeatureValueCommand;
 import github.muhsenerdev.plans.application.plan.price.add_price.AddPriceCommand;
 import github.muhsenerdev.plans.application.plan.price.add_price.AddPriceResponse;
@@ -27,9 +26,8 @@ public interface PlanApplicationService {
 
     void addFeature(@Valid AddPlanFeatureCommand command);
 
-    void archiveFeature(@Valid ArchivePlanFeatureCommand command);
+    void deleteFeature(@Valid DeletePlanFeatureCommand command);
 
     void updateFeatureValue(@Valid UpdatePlanFeatureValueCommand command);
 
-    void activateFeature(@Valid ActivatePlanFeatureCommand command);
 }

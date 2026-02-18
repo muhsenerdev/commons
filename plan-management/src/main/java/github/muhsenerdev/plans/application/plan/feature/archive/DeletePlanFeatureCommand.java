@@ -1,4 +1,4 @@
-package github.muhsenerdev.plans.application.plan.feature.activate;
+package github.muhsenerdev.plans.application.plan.feature.archive;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
@@ -14,7 +14,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ActivatePlanFeatureCommand {
+public class DeletePlanFeatureCommand {
 
     @JsonIgnore
     private UUID planId;

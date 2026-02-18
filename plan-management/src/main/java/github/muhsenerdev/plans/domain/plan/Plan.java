@@ -509,18 +509,12 @@ public class Plan extends SoftDeletableEntity {
         }
 
         /**
-         * Archives a feature in the plan.
+         * Deletes a feature from the plan.
          * 
-         * @param featureId The ID of the feature to archive.
-         * @throws PlanDomainException If the feature is not found or if the plan is
-         *                             active and has no other active features
+         * @param featureId The ID of the feature to delete.
          */
-        public void archive(UUID featureId) throws PlanDomainException {
-            PlanFeature feature = plan.getFeatureOrThrow(featureId);
-            feature.archive();
-            if (plan.isActive() && !plan.hasAnyActiveFeature()) {
-                throw PlanDomainException.featureCannotBeArchived("Plan must have at least one active feature");
-            }
+        public void delete(UUID featureId) throws PlanDomainException {
+            plan.features.removeIf(f -> f.getId().equals(featureId));
         }
 
         /**
@@ -533,17 +527,6 @@ public class Plan extends SoftDeletableEntity {
         public void updateValue(UUID featureId, String value) throws PlanDomainException {
             PlanFeature feature = plan.getFeatureOrThrow(featureId);
             feature.setValue(value);
-        }
-
-        /**
-         * Activates a feature in the plan.
-         * 
-         * @param featureId The ID of the feature to activate.
-         * @throws PlanDomainException If the feature is not found.
-         */
-        public void activate(UUID featureId) throws PlanDomainException {
-            PlanFeature feature = plan.getFeatureOrThrow(featureId);
-            feature.activate();
         }
 
     }

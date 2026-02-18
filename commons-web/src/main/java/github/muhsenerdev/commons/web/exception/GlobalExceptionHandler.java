@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import github.muhsenerdev.commons.core.exception.AuthenticationRequiredException;
+import github.muhsenerdev.commons.core.exception.BaseException;
 import github.muhsenerdev.commons.core.exception.BusinessException;
+import github.muhsenerdev.commons.core.exception.DomainException;
 import github.muhsenerdev.commons.core.exception.DuplicateException;
 import github.muhsenerdev.commons.core.exception.InternalErrorException;
 import github.muhsenerdev.commons.core.exception.InvalidDomainException;
@@ -86,8 +88,8 @@ public class GlobalExceptionHandler {
                         .build());
     }
 
-    @ExceptionHandler({ BusinessException.class, InvalidDomainException.class })
-    public ResponseEntity<BadRequestResponse> handleBadRequestException(RuntimeException ex,
+    @ExceptionHandler({ BusinessException.class, InvalidDomainException.class, DomainException.class })
+    public ResponseEntity<BadRequestResponse> handleBadRequestException(BaseException ex,
             HttpServletRequest request) {
         log.error("Bad request: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -96,6 +98,8 @@ public class GlobalExceptionHandler {
                         .path(request.getRequestURI())
                         .message(ex.getMessage())
                         .status(HttpStatus.BAD_REQUEST.value())
+                        .errors(Map.of(
+                                ex.getCode(), ex.getMessage()))
                         .build());
     }
 

@@ -4,8 +4,13 @@ import org.springframework.stereotype.Service;
 
 import github.muhsenerdev.users.core.application.user.change_password.ChangePasswordCommand;
 import github.muhsenerdev.users.core.application.user.change_password.ChangePasswordCommandHandler;
+import github.muhsenerdev.users.core.application.user.change_roles.PutUserRolesCommand;
+import github.muhsenerdev.users.core.application.user.change_roles.PutUserRolesCommandHandler;
 import github.muhsenerdev.users.core.application.user.complete.CompleteRegistrationCommand;
 import github.muhsenerdev.users.core.application.user.complete.CompleteRegistrationCommandHandler;
+import github.muhsenerdev.users.core.application.user.list.ListUsersQuery;
+import github.muhsenerdev.users.core.application.user.list.ListUsersQueryHandler;
+import github.muhsenerdev.users.core.application.user.list.UserListItem;
 import github.muhsenerdev.users.core.application.user.password_reset.CompletePasswordResetCommand;
 import github.muhsenerdev.users.core.application.user.password_reset.CompletePasswordResetCommandHandler;
 import github.muhsenerdev.users.core.application.user.password_reset.RequestPasswordResetCommand;
@@ -20,6 +25,7 @@ import github.muhsenerdev.users.core.application.user.verify_email.VerifyEmailCo
 import github.muhsenerdev.users.core.application.user.verify_email.VerifyEmailCommandHandler;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +38,8 @@ public class UserApplicationServiceImpl implements UserApplicationService {
     private final ChangePasswordCommandHandler changePassword;
     private final RequestPasswordResetCommandHandler requestPasswordReset;
     private final CompletePasswordResetCommandHandler completePasswordReset;
+    private final ListUsersQueryHandler listUsers;
+    private final PutUserRolesCommandHandler putUserRoles;
 
     @Override
     public UserRegistrationResponse registerUser(RegisterUserCommand command) {
@@ -66,6 +74,16 @@ public class UserApplicationServiceImpl implements UserApplicationService {
     @Override
     public void completePasswordReset(@Valid CompletePasswordResetCommand command) {
         completePasswordReset.handle(command);
+    }
+
+    @Override
+    public Page<UserListItem> listUsers(ListUsersQuery query) {
+        return listUsers.handle(query);
+    }
+
+    @Override
+    public void changeRoles(PutUserRolesCommand command) {
+        putUserRoles.handle(command);
     }
 
 }

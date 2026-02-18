@@ -261,6 +261,13 @@ public class User extends SoftDeletableEntity {
         activateOrIgnore();
     }
 
+    public void changeRoles(Set<Role> newRoles) {
+        if (newRoles == null || newRoles.isEmpty()) {
+            throw new InvalidDomainException("User must have at least one role.");
+        }
+        this.roles = newRoles;
+    }
+
     private void activateOrIgnore() {
         if (isActive())
             return;

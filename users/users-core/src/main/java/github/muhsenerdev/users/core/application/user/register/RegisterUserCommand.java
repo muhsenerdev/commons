@@ -2,6 +2,7 @@ package github.muhsenerdev.users.core.application.user.register;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -13,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import java.util.UUID;
 
 @Getter
 @NoArgsConstructor
@@ -37,7 +39,16 @@ public class RegisterUserCommand {
     @Schema(description = "User unique username", example = "johndoe")
     private String username;
 
+    @Schema(hidden = true)
     @Builder.Default
+    private boolean verified = false;
+
+    @Builder.Default
+    @Schema(description = "Roles to be assigned to the user. UUIDs of roles", example = "[UUID]")
+    private Set<UUID> roleIds = Set.of();
+
+    @Builder.Default
+    @Schema(description = "Other details of the user", example = "{}")
     private Map<String, Object> otherDetails = new HashMap<>();
 
     public RegisterUserCommand withEmail(String value) {

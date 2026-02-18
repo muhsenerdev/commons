@@ -2,6 +2,7 @@ package github.muhsenerdev.users.core.application.user.register;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import github.muhsenerdev.users.api.application.registration.RegistrationHook;
 import github.muhsenerdev.users.core.application.user.shared.RoleService;
 import github.muhsenerdev.users.core.application.user.shared.UserMapper;
+import github.muhsenerdev.users.core.domain.roles.Role;
 import github.muhsenerdev.users.core.domain.users.RegistrationType;
 import github.muhsenerdev.users.core.domain.users.UserCreationInput;
 import github.muhsenerdev.users.core.domain.users.UserDomainService;
@@ -33,8 +35,8 @@ public class RegisterUserCommandHandler {
         // Create user
         UserCreationInput input = userMapper.toCreationInput(command,
                 RegistrationType.PASSWORD,
-                Set.of(roleService.getOrCreateUserRole()),
-                false);
+                fetchRoles(command.getRoleIds()),
+                command.isVerified());
         var user = userDomainService.createUser(input);
 
         user.releaseEvents().forEach(eventPublisher::publishEvent);
@@ -48,4 +50,10 @@ public class RegisterUserCommandHandler {
                 .build();
     }
 
+    private Set<Role> fetchRoles(Set<UUID> roleIds) {
+        if (roleIds == null || roleIds.isEmpty()) {
+            return Set.of(roleService.getOrCreateUserRole());
+        }
+        return roleService.getRolesByIdsOrThrow(roleIds);
+    }
 }

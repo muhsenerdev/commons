@@ -1,5 +1,6 @@
 package github.muhsenerdev.users.core.infra.adapter.rest;
 
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
@@ -37,6 +38,10 @@ public class PublicRegistrationController {
             @ApiResponse(responseCode = "500", ref = BaseOpenApiConfig.INTERNAL_SERVER_ERROR_RESPONSE)
     })
     public ResponseEntity<UserRegistrationResponse> register(@Valid @RequestBody RegisterUserCommand command) {
+        command = command.toBuilder()
+                .verified(false)
+                .roleIds(Set.of())
+                .build();
         return ResponseEntity.ok(service.registerUser(command));
     }
 

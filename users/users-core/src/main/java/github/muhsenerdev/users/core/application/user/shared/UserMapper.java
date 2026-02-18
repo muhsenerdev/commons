@@ -13,6 +13,7 @@ import github.muhsenerdev.users.core.domain.roles.Role;
 import github.muhsenerdev.users.core.domain.users.EmailVerification;
 import github.muhsenerdev.users.core.domain.users.RegistrationType;
 import github.muhsenerdev.users.core.domain.users.SocialLoginDetails;
+import github.muhsenerdev.users.core.application.user.list.UserListItem;
 import github.muhsenerdev.users.core.domain.users.User;
 import github.muhsenerdev.users.core.domain.users.UserCreationInput;
 
@@ -30,6 +31,13 @@ public interface UserMapper {
     @Mapping(target = "userId", source = "id")
     @Mapping(target = "roles", expression = "java(user.getRoles().stream().map(r -> r.getName()).collect(java.util.stream.Collectors.toSet()))")
     UserInfo toUserInfo(User user);
+
+    @Mapping(target = "verificationStatus", source = "emailVerification.status")
+    @Mapping(target = "createdAt", expression = "java(user.getCreatedAt() != null ? user.getCreatedAt().atOffset(java.time.ZoneOffset.UTC) : null)")
+    @Mapping(target = "updatedAt", expression = "java(user.getUpdatedAt() != null ? user.getUpdatedAt().atOffset(java.time.ZoneOffset.UTC) : null)")
+    UserListItem toListItem(User user);
+
+    UserListItem.RoleDTO toRoleDto(Role role);
 
     CodeResendResponse toCodeResendResponse(EmailVerification emailVerification);
 

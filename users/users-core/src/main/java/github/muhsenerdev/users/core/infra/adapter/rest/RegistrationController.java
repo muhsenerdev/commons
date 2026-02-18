@@ -29,7 +29,9 @@ public class RegistrationController {
             @AuthenticationPrincipal Principal principal,
             @Valid @RequestBody CompleteRegistrationCommand command) {
 
-        command = command.toBuilder().userId(principal.getUserId()).build();
+        command = command.toBuilder()
+                .userId(principal.getUserId())
+                .build();
 
         service.completeRegistration(command);
         return ResponseEntity.noContent().build();

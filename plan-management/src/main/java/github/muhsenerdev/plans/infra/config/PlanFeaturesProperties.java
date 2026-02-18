@@ -1,24 +1,22 @@
 package github.muhsenerdev.plans.infra.config;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import github.muhsenerdev.plans.domain.feature.FeatureType;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Configuration
+@Component
 @ConfigurationProperties(prefix = "plans")
-@Getter
-@Setter
+@Data
 public class PlanFeaturesProperties {
 
-    private List<CoreFeature> coreFeatures;
+    private List<CoreFeature> coreFeatures = new ArrayList<>();
 
-    @Getter
-    @Setter
+    @Data
     public static class CoreFeature {
         private String code;
         private String name;

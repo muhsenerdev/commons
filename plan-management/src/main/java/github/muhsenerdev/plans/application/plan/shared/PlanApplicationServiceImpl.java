@@ -3,6 +3,8 @@ package github.muhsenerdev.plans.application.plan.shared;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import github.muhsenerdev.plans.application.plan.activate.ActivatePlanCommand;
+import github.muhsenerdev.plans.application.plan.activate.ActivatePlanCommandHandler;
 import github.muhsenerdev.plans.application.plan.create.CreatePlanCommand;
 import github.muhsenerdev.plans.application.plan.create.CreatePlanCommandHandler;
 import github.muhsenerdev.plans.application.plan.create.PlanCreationResponse;
@@ -37,6 +39,7 @@ public class PlanApplicationServiceImpl implements PlanApplicationService {
     private final AddPlanFeatureCommandHandler addPlanFeatureCommandHandler;
     private final DeletePlanFeatureCommandHandler deletePlanFeatureCommandHandler;
     private final UpdatePlanFeatureValueCommandHandler updatePlanFeatureValueCommandHandler;
+    private final ActivatePlanCommandHandler activatePlanCommandHandler;
 
     @Override
     public PlanCreationResponse createPlan(CreatePlanCommand command) {
@@ -76,6 +79,11 @@ public class PlanApplicationServiceImpl implements PlanApplicationService {
     @Override
     public void updateFeatureValue(UpdatePlanFeatureValueCommand command) {
         updatePlanFeatureValueCommandHandler.handle(command);
+    }
+
+    @Override
+    public void activatePlan(ActivatePlanCommand command) {
+        activatePlanCommandHandler.handle(command);
     }
 
 }

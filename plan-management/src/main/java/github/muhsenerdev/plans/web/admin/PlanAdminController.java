@@ -10,14 +10,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import github.muhsenerdev.plans.application.plan.activate.ActivatePlanCommand;
 import github.muhsenerdev.plans.application.plan.create.CreatePlanCommand;
 import github.muhsenerdev.plans.application.plan.create.PlanCreationResponse;
 import github.muhsenerdev.plans.application.plan.price.add_price.AddPriceCommand;
 import github.muhsenerdev.plans.application.plan.price.add_price.AddPriceResponse;
 import github.muhsenerdev.plans.application.plan.price.delete_price.DeletePriceCommand;
 import github.muhsenerdev.plans.application.plan.price.update_price.UpdatePriceCommand;
-import github.muhsenerdev.plans.application.plan.update.UpdatePlanCommand;
 import github.muhsenerdev.plans.application.plan.shared.PlanApplicationService;
+import github.muhsenerdev.plans.application.plan.update.UpdatePlanCommand;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -68,5 +69,15 @@ public class PlanAdminController {
                 .priceId(priceId)
                 .build();
         planApplicationService.deletePrice(command);
+    }
+
+    @PostMapping("/{id}/activate")
+    @Operation(summary = "Activate a plan", description = "Allows an administrator to initiate the plan activation process (non-transactional due to external gateway interaction)")
+    public void activatePlan(@PathVariable UUID id) {
+        ActivatePlanCommand command = ActivatePlanCommand
+                .builder()
+                .planId(id)
+                .build();
+        planApplicationService.activatePlan(command);
     }
 }

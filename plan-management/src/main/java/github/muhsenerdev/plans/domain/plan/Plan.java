@@ -76,6 +76,9 @@ public class Plan extends SoftDeletableEntity {
     @Column(nullable = false, name = "tier")
     private int tier;
 
+    @Column(name = "activation_fail_reason", columnDefinition = "text")
+    private String activationFailReason;
+
     @Transient
     private PriceFacade priceFacade = new PriceFacade(this);
 
@@ -138,89 +141,51 @@ public class Plan extends SoftDeletableEntity {
 
     }
 
-    // public PlanPrice addPrice(Money price, Interval interval) {
-    // if (isFree()) {
-    // throw PlanDomainException.priceCannotBeAddedToFreePlan(this.getId());
-    // }
-    // PlanPrice planPrice = PlanPrice.builder()
-    // .plan(this)
-    // .price(price)
-    // .interval(interval)
-    // .build();
-    // this.prices.add(planPrice);
-    // return planPrice;
-    // }
+    public void activationFailed(String reason) {
+        if (status == PlanStatus.ACTIVATING) {
+            this.status = PlanStatus.ACTIVATION_FAILED;
+            this.activationFailReason = reason;
+        }
 
-    public Optional<PlanPrice> getLastPrice() {
-        return this.prices.isEmpty() ? Optional.empty() : Optional.of(this.prices.getLast());
     }
 
-    public List<String> canPlanBeActivated(Set<UUID> priceIds) {
-        if (status != PlanStatus.DRAFT && status != PlanStatus.ARCHIVED) {
-            return List.of("Plan is not in draft or active status");
-        }
-
-        if (!hasAnyActiveFeature()) {
-            return List.of("Plan must have at least one feature");
-        }
-        if (isFree()) {
-            return List.of();
-        }
-
-        if (priceIds == null || priceIds.isEmpty()) {
-            return List.of("To active paid plan, priceIds cannot be null or empty");
-        }
-
-        if (this.prices.isEmpty()) {
-            return List.of("Paid plan has no prices");
-        }
-
-        List<String> errors = new ArrayList<>();
-        Set<Interval> seenIntervals = new HashSet<>();
-        List<PlanPrice> pricesToActivate = this.prices.stream()
-                .filter(price -> priceIds.contains(price.getId()))
-                .map(price -> {
-                    Interval priceInterval = price.getPriceInterval();
-                    if (seenIntervals.contains(priceInterval)) {
-                        errors.add("Duplicate prices detected on interval: " + priceInterval);
-                    } else {
-                        seenIntervals.add(priceInterval);
-                    }
-                    return price;
-                }).toList();
-        if (!errors.isEmpty()) {
-            return errors;
-        }
-
-        if (pricesToActivate.isEmpty()) {
-            return List.of("No valid prices found to activate");
-        }
-
-        return List.of();
+    public void reserveForActivation() {
+        tryActivate();
+        this.status = PlanStatus.ACTIVATING;
     }
 
-    public void activatePlan(String stripeProductId, Map<UUID, String> priceIdToStripeIdMap) {
-
-        List<String> errors = canPlanBeActivated(priceIdToStripeIdMap.keySet());
-        if (!errors.isEmpty()) {
-            throw PlanDomainException.cannotBeActivated(errors.get(0));
+    private void tryActivate() {
+        if (!isDraft()) {
+            throw new InvalidDomainException("Plan is not in draft or archived status");
+        }
+        // Check if it has any feature.
+        if (this.features.isEmpty()) {
+            throw new InvalidDomainException("Plan must have at least one feature to activate.");
         }
 
-        if (isFree()) {
-            this.status = PlanStatus.ACTIVE;
-            return;
+        // Check if it has any price if it is PAID plan.
+        if (!isFree() && this.prices.isEmpty()) {
+            throw new InvalidDomainException("PAID plans must have at least one price to activate.");
+        }
+    }
+
+    public void activate(String providerId, Map<UUID, String> priceProviderIds) {
+        if (this.status != PlanStatus.ACTIVATING) {
+            throw new InvalidDomainException("Plan must be in ACTIVATING status to be activated");
         }
 
-        if (priceIdToStripeIdMap == null || priceIdToStripeIdMap.isEmpty()
-                || priceIdToStripeIdMap.containsValue(null)) {
-            throw new InvalidInputException("To active paid plan, priceId and stripe Id map cannot be null or empty");
-        }
-
-        this.prices.stream()
-                .filter(price -> priceIdToStripeIdMap.containsKey(price.getId()))
-                .forEach(price -> price.activate(priceIdToStripeIdMap.get(price.getId())));
+        this.stripeProductId = providerId;
         this.status = PlanStatus.ACTIVE;
-        this.stripeProductId = stripeProductId;
+        this.activationFailReason = null;
+
+        if (!isFree() && priceProviderIds != null) {
+            this.prices.forEach(price -> {
+                String priceProviderId = priceProviderIds.get(price.getId());
+                if (priceProviderId != null) {
+                    price.activate(priceProviderId);
+                }
+            });
+        }
     }
 
     @JsonIgnore
@@ -248,30 +213,6 @@ public class Plan extends SoftDeletableEntity {
         this.tier = input.tier();
         validate();
     }
-
-    // public void updateFull(String name, String title, String description,
-    // PlanType planType, String code, int tier) {
-    // if (this.status != PlanStatus.DRAFT) {
-    // throw PlanDomainException.cannotBeUpdated("Plan is not in draft status");
-    // }
-    // this.name = name;
-    // this.title = title;
-    // this.description = description;
-    // this.type = planType;
-    // this.code = code;
-    // this.tier = tier;
-    // validate();
-    // }
-
-    // public void updatePrice(UUID priceId, Money price, Interval interval) {
-    // PlanPrice planPrice = this.prices.stream()
-    // .filter(p -> p.getId().equals(priceId))
-    // .findFirst()
-    // .orElseThrow(() -> new InvalidInputException("Plan price not found with id: "
-    // + priceId));
-    // planPrice.update(price, interval);
-
-    // }
 
     public void addFeature(Feature feature, String value) {
         if (feature == null) {

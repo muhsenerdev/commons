@@ -1,6 +1,7 @@
 package github.muhsenerdev.plans.application.plan.shared;
 
 import java.util.UUID;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +40,28 @@ public class PlanService {
         return planRepository.findWithFeaturesDeeplyById(id)
                 .orElseThrow(
                         () -> new NotFoundException("plan.not_found", "Plan not found with id: " + id));
+    }
+
+    @Transactional
+    public Plan reserveForActivation(UUID id) {
+        Plan plan = findWithFeaturesOrThrow(id);
+        plan.reserveForActivation();
+        return planRepository.save(plan);
+    }
+
+    @Transactional
+    public void finalizeActivation(UUID id, String providerId, Map<UUID, String> priceProviderIds) {
+        Plan plan = findWithPricesOrThrow(id);
+        plan.activate(providerId, priceProviderIds);
+        planRepository.save(plan);
+    }
+
+    @Transactional
+    public void markAsFailed(UUID id, String reason) {
+        planRepository.findById(id).ifPresent(plan -> {
+            plan.activationFailed(reason);
+            planRepository.save(plan);
+        });
     }
 
 }

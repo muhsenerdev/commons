@@ -81,7 +81,7 @@ public class PlanApplicationServiceTest {
     @DisplayName("Duplicated Plan Tier")
     void givenTier10AlreadyExists_whenPlanWithTier10IsCreated_thenThrowException() {
         // ARRANGE
-        PlanDSL.draftPlan().withTier(10).save(planRepository);
+        PlanDSL.aDraftPlan().withTier(10).save(planRepository);
         command = command.toBuilder().tier(10).build();
 
         // ACT & ASSERT
@@ -93,7 +93,7 @@ public class PlanApplicationServiceTest {
     void givenDuplicatedPlanCode_whenPlanWithDuplicatedCodeIsCreated_thenThrowException() {
         // ARRANGE
         String sameCode = "code";
-        PlanDSL.draftPlan().withCode(sameCode).save(planRepository);
+        PlanDSL.aDraftPlan().withCode(sameCode).save(planRepository);
         command = command.toBuilder().code(sameCode).build();
 
         // ACT & ASSERT

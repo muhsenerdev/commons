@@ -31,4 +31,6 @@ public interface PlanApplicationService {
 
     void updateFeatureValue(@Valid UpdatePlanFeatureValueCommand command);
 
+    void activatePlan(@Valid github.muhsenerdev.plans.application.plan.activate.ActivatePlanCommand command);
+
 }

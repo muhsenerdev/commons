@@ -30,7 +30,7 @@ public class ActivatePlanCommandHandler {
      */
     public void handle(ActivatePlanCommand command) {
         UUID planId = command.getPlanId();
-        log.info("Starting activation for plan: {}", planId);
+        log.debug("Starting activation for plan: {}", planId);
 
         Plan plan;
         try {
@@ -39,6 +39,12 @@ public class ActivatePlanCommandHandler {
         } catch (Exception e) {
             log.error("Failed to reserve plan for activation: {}", planId, e);
             throw e;
+        }
+
+        if (plan.isFree()) {
+            planService.finalizeActivation(planId, null, null);
+            log.debug("Successfully activated free plan: {}", planId);
+            return;
         }
 
         try {
@@ -52,10 +58,10 @@ public class ActivatePlanCommandHandler {
                     .collect(Collectors.toMap(PricePaymentDto::id, PricePaymentDto::providerId));
 
             planService.finalizeActivation(planId, providerId, priceProviderIds);
-            log.info("Successfully activated plan: {}", planId);
+            log.debug("Successfully activated plan: {}", planId);
 
         } catch (Exception e) {
-            log.error("Failed to activate plan via gateway: {}. Marking as failed.", planId, e);
+            log.debug("Failed to activate plan via gateway: {}. Marking as failed.", planId, e);
             // Step 4: Mark as failed (Transactional)
             planService.markAsFailed(planId, e.getMessage());
             throw e;

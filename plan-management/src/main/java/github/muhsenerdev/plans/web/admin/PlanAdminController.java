@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import github.muhsenerdev.plans.application.plan.activate.ActivatePlanCommand;
+import github.muhsenerdev.plans.application.plan.archive.ArchievePlanCommand;
 import github.muhsenerdev.plans.application.plan.create.CreatePlanCommand;
 import github.muhsenerdev.plans.application.plan.create.PlanCreationResponse;
 import github.muhsenerdev.plans.application.plan.delete.DeletePlanCommand;
@@ -59,5 +60,14 @@ public class PlanAdminController {
                 .planId(id)
                 .build();
         planApplicationService.deletePlan(command);
+    }
+
+    @PostMapping("/{id}/archive")
+    @Operation(summary = "Archive a plan", description = "Allows an administrator to archive an existing plan if it is in DRAFT status")
+    public void archivePlan(@PathVariable UUID id) {
+        ArchievePlanCommand command = ArchievePlanCommand.builder()
+                .planId(id)
+                .build();
+        planApplicationService.archivePlan(command);
     }
 }

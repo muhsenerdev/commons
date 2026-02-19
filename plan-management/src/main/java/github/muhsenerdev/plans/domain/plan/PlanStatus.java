@@ -5,5 +5,7 @@ public enum PlanStatus {
     ACTIVATING,
     ACTIVATION_FAILED,
     ACTIVE,
+    ARCHIVING,
+    ARCHIVE_FAILED,
     ARCHIVED;
 }

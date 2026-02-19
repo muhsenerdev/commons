@@ -278,6 +278,14 @@ public class Plan extends SoftDeletableEntity {
         }
     }
 
+    public void reserveForArchiving() throws PlanDomainException {
+        if (!isActive()) {
+            throw PlanDomainException.illegalOperation("Plan must be in ACTIVE status to be archived");
+        }
+        this.status = PlanStatus.ARCHIVING;
+        this.prices.forEach(PlanPrice::reserveForArchiving);
+    }
+
     public void archive() {
         if (this.status != PlanStatus.ACTIVE) {
             throw PlanDomainException.cannotBeArchived("Plan must be in ACTIVE status to be archived");

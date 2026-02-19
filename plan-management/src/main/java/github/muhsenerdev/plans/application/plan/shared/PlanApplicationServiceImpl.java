@@ -5,6 +5,8 @@ import org.springframework.validation.annotation.Validated;
 
 import github.muhsenerdev.plans.application.plan.activate.ActivatePlanCommand;
 import github.muhsenerdev.plans.application.plan.activate.ActivatePlanCommandHandler;
+import github.muhsenerdev.plans.application.plan.archive.ArchievePlanCommand;
+import github.muhsenerdev.plans.application.plan.archive.ArchievePlanCommandHandler;
 import github.muhsenerdev.plans.application.plan.create.CreatePlanCommand;
 import github.muhsenerdev.plans.application.plan.create.CreatePlanCommandHandler;
 import github.muhsenerdev.plans.application.plan.create.PlanCreationResponse;
@@ -23,6 +25,7 @@ public class PlanApplicationServiceImpl implements PlanApplicationService {
     private final UpdatePlanCommandHandler updatePlanCommandHandler;
     private final ActivatePlanCommandHandler activatePlanCommandHandler;
     private final DeletePlanCommandHandler deletePlanCommandHandler;
+    private final ArchievePlanCommandHandler archivePlanCommandHandler;
 
     @Override
     public PlanCreationResponse createPlan(CreatePlanCommand command) {
@@ -42,6 +45,11 @@ public class PlanApplicationServiceImpl implements PlanApplicationService {
     @Override
     public void deletePlan(DeletePlanCommand command) {
         deletePlanCommandHandler.handle(command);
+    }
+
+    @Override
+    public void archivePlan(ArchievePlanCommand command) {
+        archivePlanCommandHandler.handle(command);
     }
 
 }

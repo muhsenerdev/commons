@@ -1,6 +1,7 @@
 package github.muhsenerdev.plans.application.plan.shared;
 
 import github.muhsenerdev.plans.application.plan.activate.ActivatePlanCommand;
+import github.muhsenerdev.plans.application.plan.archive.ArchievePlanCommand;
 import github.muhsenerdev.plans.application.plan.create.CreatePlanCommand;
 import github.muhsenerdev.plans.application.plan.create.PlanCreationResponse;
 import github.muhsenerdev.plans.application.plan.delete.DeletePlanCommand;
@@ -16,5 +17,7 @@ public interface PlanApplicationService {
     void activatePlan(@Valid ActivatePlanCommand command);
 
     void deletePlan(@Valid DeletePlanCommand command);
+
+    void archivePlan(@Valid ArchievePlanCommand command);
 
 }

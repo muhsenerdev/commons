@@ -25,7 +25,7 @@ public class CreatePlanCommand {
     private final String code;
 
     @Schema(description = "Detailed description of the plan", example = "The basic plan for individual users")
-    @Size(min = 3, max = 500, message = "Plan description must be between 3 and 500 characters")
+    @Size(min = 3, max = 500, message = "Plan description must be between 3 and 500 characters, if provided.")
     private final String description;
 
     @Schema(description = "Short title of the plan", example = "Basic")
@@ -38,9 +38,9 @@ public class CreatePlanCommand {
     @Size(min = 3, max = 255, message = "Plan name must be between 3 and 255 characters")
     private final String name;
 
-    @Schema(description = "Type of the plan", example = "PAID")
+    @Schema(description = "Type of the plan", example = "PAID", implementation = PlanType.class)
     @NotNull(message = "Plan type is required")
-    private final PlanType type;
+    private final String type;
 
     @Schema(description = "Hierarchy level of the plan", example = "1")
     @Positive(message = "Plan tier must be positive.")

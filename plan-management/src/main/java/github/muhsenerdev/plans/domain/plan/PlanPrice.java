@@ -1,5 +1,7 @@
 package github.muhsenerdev.plans.domain.plan;
 
+import java.util.function.IntPredicate;
+
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -56,21 +58,46 @@ public class PlanPrice extends SoftDeletableEntity {
     @Column(nullable = false)
     private PriceStatus status;
 
+    @Column(name = "activation_fail_reason", columnDefinition = "text")
+    private String activationFailReason;
+
     @Builder
     protected PlanPrice(Plan plan, Money price, Interval interval) {
         this.plan = plan;
         this.price = price;
         this.priceInterval = interval;
         this.status = PriceStatus.DRAFT;
+    }
 
+    protected void reserveForArchiving() {
+        if (this.status != PriceStatus.ACTIVE) {
+            throw PlanDomainException.illegalOperation("To archive a price, it must be in active status, but found: {}",
+                    this.status.name());
+        }
+        this.status = PriceStatus.ARCHIVING;
+    }
+
+    protected void reserveForActivation() {
+        if (this.status != PriceStatus.DRAFT) {
+            throw PlanDomainException.priceCannotBeActivated("Plan price is not in draft status");
+        }
+        this.status = PriceStatus.ACTIVATING;
     }
 
     protected void activate(String stripePriceId) {
-        if (this.status != PriceStatus.DRAFT && this.status != PriceStatus.ARCHIVED) {
-            throw PlanDomainException.priceCannotBeActivated("Plan price is not in draft or archived status");
+        if (this.status != PriceStatus.ACTIVATING) {
+            throw PlanDomainException.priceCannotBeActivated("Plan price must be in ACTIVATING status to be activated");
         }
         this.stripePriceId = stripePriceId;
         this.status = PriceStatus.ACTIVE;
+        this.activationFailReason = null;
+    }
+
+    protected void activationFailed(String reason) {
+        if (this.status == PriceStatus.ACTIVATING) {
+            this.status = PriceStatus.ACTIVATION_FAILED;
+            this.activationFailReason = reason;
+        }
     }
 
     public boolean isDraft() {
@@ -78,6 +105,10 @@ public class PlanPrice extends SoftDeletableEntity {
     }
 
     public void archive() {
+        if (this.status != PriceStatus.ACTIVE) {
+            throw PlanDomainException.illegalOperation("To archive a price, it must be in active status, but found: {}",
+                    this.status.name());
+        }
         this.status = PriceStatus.ARCHIVED;
     }
 
@@ -91,6 +122,14 @@ public class PlanPrice extends SoftDeletableEntity {
         }
         this.price = price;
         this.priceInterval = interval;
+    }
+
+    public boolean isActivating() {
+        return this.status == PriceStatus.ACTIVATING;
+    }
+
+    public boolean isActivationFailed() {
+        return this.status == PriceStatus.ACTIVATION_FAILED;
     }
 
 }

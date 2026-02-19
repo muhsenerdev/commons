@@ -37,12 +37,13 @@ public class PlanDomainService {
         }
     }
 
-    public void updatePlan(Plan plan, PlanBasicsInput input) {
-        if (!Objects.equals(plan.getTier(), input.tier())) {
-            ensureTierIsUnique(input.tier());
-        }
-        plan.updateBasics(input.name(), input.title(), input.description(), input.tier());
-    }
+    // public void updatePlan(Plan plan, PlanBasicsInput input) {
+    // if (!Objects.equals(plan.getTier(), input.tier())) {
+    // ensureTierIsUnique(input.tier());
+    // }
+    // plan.updateBasics(input.name(), input.title(), input.description(),
+    // input.tier());
+    // }
 
     public void updatePlan(Plan plan, PlanInput input) {
         // If tier or code is changed, ensure they are unique

@@ -20,8 +20,16 @@ public class PaymentGatewayImpl implements PaymentGateway {
         List<PricePaymentDto> pricePaymentDtos = planPaymentDto.prices().stream().map(pricePaymentDto -> {
             return pricePaymentDto.toBuilder().providerId("providerID-" + UUID.randomUUID()).build();
         }).toList();
+
         return planPaymentDto.toBuilder().providerId("providerID-" + UUID.randomUUID()).prices(pricePaymentDtos)
                 .build();
     }
 
+    @Override
+    public PricePaymentDto createPrice(PricePaymentDto pricePaymentDto, String planProviderId) {
+        log.info("Creating price for plan {}: {}", planProviderId, pricePaymentDto);
+        return pricePaymentDto.toBuilder()
+                .providerId("priceProviderID-" + UUID.randomUUID())
+                .build();
+    }
 }

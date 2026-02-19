@@ -14,7 +14,7 @@ import github.muhsenerdev.plans.application.plan.feature.add.AddPlanFeatureComma
 import github.muhsenerdev.plans.application.plan.feature.add.AddPlanFeatureResponse;
 import github.muhsenerdev.plans.application.plan.feature.archive.DeletePlanFeatureCommand;
 import github.muhsenerdev.plans.application.plan.feature.update_value.UpdatePlanFeatureValueCommand;
-import github.muhsenerdev.plans.application.plan.shared.PlanApplicationService;
+import github.muhsenerdev.plans.application.plan.shared.PlanFeatureApplicationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -26,14 +26,14 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "Plan Feature Admin", description = "Endpoints for managing features of a specific plan")
 public class PlanFeatureAdminController {
 
-    private final PlanApplicationService planApplicationService;
+    private final PlanFeatureApplicationService planFeatureApplicationService;
 
     @PostMapping("")
     @Operation(summary = "Add a feature to a plan", description = "Adds a global feature to the specified plan with a value")
     public AddPlanFeatureResponse addFeature(@PathVariable UUID planId,
             @Valid @RequestBody AddPlanFeatureCommand command) {
         command.setPlanId(planId);
-        return planApplicationService.addFeature(command);
+        return planFeatureApplicationService.addFeature(command);
     }
 
     @DeleteMapping("/{planFeatureId}")
@@ -43,7 +43,7 @@ public class PlanFeatureAdminController {
                 .planId(planId)
                 .planFeatureId(planFeatureId)
                 .build();
-        planApplicationService.deleteFeature(command);
+        planFeatureApplicationService.deleteFeature(command);
     }
 
     @PatchMapping("/{planFeatureId}")
@@ -52,7 +52,7 @@ public class PlanFeatureAdminController {
             @Valid @RequestBody UpdatePlanFeatureValueCommand command) {
         command.setPlanId(planId);
         command.setPlanFeatureId(planFeatureId);
-        planApplicationService.updateFeatureValue(command);
+        planFeatureApplicationService.updateFeatureValue(command);
     }
 
 }

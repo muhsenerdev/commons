@@ -1,7 +1,8 @@
 package github.muhsenerdev.plans.application.plan.shared;
 
-import java.util.UUID;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +35,11 @@ public class PlanService {
                         () -> new NotFoundException("plan.not_found", "Plan not found with id: " + id));
     }
 
+    public Optional<Plan> findWithPrices(UUID id) {
+        Assert.notNull(id, "PlanId cannot be null!");
+        return planRepository.findWithPricesById(id);
+    }
+
     @Transactional
     public Plan findWithFeaturesOrThrow(UUID id) {
         Assert.notNull(id, "PlanId cannot be null!");
@@ -62,6 +68,41 @@ public class PlanService {
             plan.activationFailed(reason);
             planRepository.save(plan);
         });
+    }
+
+    @Transactional
+    public Plan reservePriceForActivation(UUID planId, UUID priceId, boolean overrideActivePrice) {
+        Plan plan = findWithPricesOrThrow(planId);
+        plan.prices().reserveForActivation(priceId, overrideActivePrice);
+        return planRepository.save(plan);
+    }
+
+    @Transactional
+    public void finalizePriceActivation(UUID planId, UUID priceId, String providerId) {
+        Plan plan = findWithPricesOrThrow(planId);
+        plan.prices().finalizeActivation(priceId, providerId);
+        planRepository.save(plan);
+    }
+
+    @Transactional
+    public void markPriceAsFailed(UUID planId, UUID priceId, String reason) {
+        planRepository.findWithPricesById(planId).ifPresent(plan -> {
+            plan.prices().markAsFailed(priceId, reason);
+            planRepository.save(plan);
+        });
+    }
+
+    @Transactional
+    public void reservePriceForArchive(UUID planId, UUID priceId) {
+        planRepository.findWithPricesById(planId).ifPresent(plan -> {
+            plan.prices().reserveForArchive(priceId);
+            planRepository.save(plan);
+        });
+    }
+
+    @Transactional
+    public Plan save(Plan plan) {
+        return planRepository.save(plan);
     }
 
 }

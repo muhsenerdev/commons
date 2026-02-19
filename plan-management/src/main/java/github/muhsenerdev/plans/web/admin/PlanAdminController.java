@@ -13,10 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import github.muhsenerdev.plans.application.plan.activate.ActivatePlanCommand;
 import github.muhsenerdev.plans.application.plan.create.CreatePlanCommand;
 import github.muhsenerdev.plans.application.plan.create.PlanCreationResponse;
-import github.muhsenerdev.plans.application.plan.price.add_price.AddPriceCommand;
-import github.muhsenerdev.plans.application.plan.price.add_price.AddPriceResponse;
-import github.muhsenerdev.plans.application.plan.price.delete_price.DeletePriceCommand;
-import github.muhsenerdev.plans.application.plan.price.update_price.UpdatePriceCommand;
+import github.muhsenerdev.plans.application.plan.delete.DeletePlanCommand;
 import github.muhsenerdev.plans.application.plan.shared.PlanApplicationService;
 import github.muhsenerdev.plans.application.plan.update.UpdatePlanCommand;
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,32 +42,6 @@ public class PlanAdminController {
         planApplicationService.updatePlan(command);
     }
 
-    @PostMapping("/{id}/prices")
-    @Operation(summary = "Add a price to a plan", description = "Allows an administrator to add a price to an existing plan")
-    public AddPriceResponse addPrice(@PathVariable UUID id, @Valid @RequestBody AddPriceCommand command) {
-        command.setId(id);
-        return planApplicationService.addPrice(command);
-    }
-
-    @PutMapping("/{id}/prices/{priceId}")
-    @Operation(summary = "Update a price in a plan", description = "Allows an administrator to update a price in an existing plan if it is in DRAFT status")
-    public void updatePrice(@PathVariable UUID id, @PathVariable UUID priceId,
-            @Valid @RequestBody UpdatePriceCommand command) {
-        command.setPlanId(id);
-        command.setPriceId(priceId);
-        planApplicationService.updatePrice(command);
-    }
-
-    @DeleteMapping("/{id}/prices/{priceId}")
-    @Operation(summary = "Delete a price from a plan", description = "Allows an administrator to delete a price from an existing plan if it is in DRAFT status")
-    public void deletePrice(@PathVariable UUID id, @PathVariable UUID priceId) {
-        DeletePriceCommand command = DeletePriceCommand.builder()
-                .planId(id)
-                .priceId(priceId)
-                .build();
-        planApplicationService.deletePrice(command);
-    }
-
     @PostMapping("/{id}/activate")
     @Operation(summary = "Activate a plan", description = "Allows an administrator to initiate the plan activation process (non-transactional due to external gateway interaction)")
     public void activatePlan(@PathVariable UUID id) {
@@ -79,5 +50,14 @@ public class PlanAdminController {
                 .planId(id)
                 .build();
         planApplicationService.activatePlan(command);
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete a plan", description = "Allows an administrator to delete an existing plan if it is in DRAFT status")
+    public void deletePlan(@PathVariable UUID id) {
+        DeletePlanCommand command = DeletePlanCommand.builder()
+                .planId(id)
+                .build();
+        planApplicationService.deletePlan(command);
     }
 }

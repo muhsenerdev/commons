@@ -1,12 +1,9 @@
 package github.muhsenerdev.plans.domain.plan;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import org.hibernate.annotations.SQLDelete;
@@ -145,33 +142,35 @@ public class Plan extends SoftDeletableEntity {
         if (status == PlanStatus.ACTIVATING) {
             this.status = PlanStatus.ACTIVATION_FAILED;
             this.activationFailReason = reason;
+            this.prices.forEach(p -> p.activationFailed(reason));
         }
 
     }
 
-    public void reserveForActivation() {
+    public void reserveForActivation() throws PlanDomainException {
         tryActivate();
         this.status = PlanStatus.ACTIVATING;
+        this.prices.forEach(price -> price.reserveForActivation());
     }
 
     private void tryActivate() {
         if (!isDraft()) {
-            throw new InvalidDomainException("Plan is not in draft or archived status");
+            throw PlanDomainException.illegalOperation("To activate a plan, it must be in DRAFT status.");
         }
         // Check if it has any feature.
         if (this.features.isEmpty()) {
-            throw new InvalidDomainException("Plan must have at least one feature to activate.");
+            throw PlanDomainException.atleastOneFeature("Plan must have at least one feature to activate.");
         }
 
         // Check if it has any price if it is PAID plan.
         if (!isFree() && this.prices.isEmpty()) {
-            throw new InvalidDomainException("PAID plans must have at least one price to activate.");
+            throw PlanDomainException.atleastOnePrice("PAID plans must have at least one price to activate.");
         }
     }
 
     public void activate(String providerId, Map<UUID, String> priceProviderIds) {
         if (this.status != PlanStatus.ACTIVATING) {
-            throw new InvalidDomainException("Plan must be in ACTIVATING status to be activated");
+            throw PlanDomainException.illegalOperation("Plan must be in ACTIVATING status to be activated");
         }
 
         this.stripeProductId = providerId;
@@ -193,17 +192,23 @@ public class Plan extends SoftDeletableEntity {
         return this.type == PlanType.FREE;
     }
 
-    public void updateBasics(String name, String title, String description, int tier) {
-        this.name = name;
-        this.title = title;
-        this.description = description;
-        this.tier = tier;
-        validate();
-    }
+    // public void updateBasics(String name, String title, String description, int
+    // tier) {
+    // this.name = name;
+    // this.title = title;
+    // this.description = description;
+    // this.tier = tier;
+    // validate();
+    // }
+
+    // ====================================
+    // =========== UPDATE PLAN ============
+    // ====================================
 
     public void updateFull(PlanInput input) {
         if (this.status != PlanStatus.DRAFT) {
-            throw PlanDomainException.cannotBeUpdated("Plan is not in draft status");
+            throw PlanDomainException.illegalOperation("Only DRAFT plans can be updated. Plan Status: {}",
+                    this.status.name());
         }
         this.name = input.name();
         this.title = input.title();
@@ -243,11 +248,6 @@ public class Plan extends SoftDeletableEntity {
         return this.features.isEmpty() ? Optional.empty() : Optional.of(this.features.getLast());
     }
 
-    private boolean hasAnyActiveFeature() {
-        return this.features.stream()
-                .anyMatch(feature -> feature.getStatus() == FeatureStatus.ACTIVE);
-    }
-
     public boolean isActive() {
         return this.status == PlanStatus.ACTIVE;
     }
@@ -258,36 +258,6 @@ public class Plan extends SoftDeletableEntity {
     }
 
     // ========== ACTIVATE PLAN PRICE ==========
-    public void checkPriceCanBeActivated(UUID priceId) {
-        if (!isActive()) {
-            throw PlanDomainException.cannotBeActivated("Plan must be ACTIVE to activate a price");
-        }
-
-        PlanPrice targetPrice = this.prices.stream()
-                .filter(price -> price.getId().equals(priceId))
-                .findFirst()
-                .orElseThrow(() -> new InvalidInputException("Plan price not found: " + priceId));
-
-        if (targetPrice.getStatus() != PriceStatus.DRAFT) {
-            throw PlanDomainException.cannotBeActivated("Plan price must be in DRAFT status to be activated");
-        }
-
-        boolean activePriceExistsForSameInterval = this.prices.stream()
-                .filter(price -> price.isActive() && price.getPriceInterval().equals(targetPrice.getPriceInterval()))
-                .anyMatch(price -> !price.getId().equals(priceId));
-
-        if (activePriceExistsForSameInterval) {
-            throw PlanDomainException.cannotBeActivated(
-                    "An active price already exists for interval: " + targetPrice.getPriceInterval());
-        }
-    }
-
-    public void activatePrice(UUID priceId, String stripePriceId) {
-        checkPriceCanBeActivated(priceId);
-        this.prices.stream()
-                .filter(price -> price.getId().equals(priceId))
-                .forEach(price -> price.activate(stripePriceId));
-    }
 
     public boolean arePlanAndPriceActive(UUID priceId) {
         return this.status == PlanStatus.ACTIVE && this.prices.stream()
@@ -297,9 +267,14 @@ public class Plan extends SoftDeletableEntity {
                 .orElse(false);
     }
 
-    public void delete() {
+    /**
+     * Checks if the plan can be deleted. If not, throws a PlanDomainException.
+     * 
+     * @throws PlanDomainException if the plan is not in DRAFT status
+     */
+    public void delete() throws PlanDomainException {
         if (this.status != PlanStatus.DRAFT) {
-            throw PlanDomainException.planCannotBeDeleted("Only plans in DRAFT status can be deleted");
+            throw PlanDomainException.illegalOperation("Only plans in DRAFT status can be deleted.");
         }
     }
 
@@ -329,8 +304,6 @@ public class Plan extends SoftDeletableEntity {
     }
 
     private void ensurePriceUniquenessOn(Interval interval, PriceStatus status) {
-        if (status == PriceStatus.ARCHIVED)
-            return;
         boolean hasPriceOnTheSameInterval = this.hasPrice(interval, status);
         if (hasPriceOnTheSameInterval) {
             throw new PlanDomainException("plan.duplicate_price",
@@ -338,11 +311,15 @@ public class Plan extends SoftDeletableEntity {
         }
     }
 
-    private boolean hasPrice(Interval interval, PriceStatus draft) {
+    private Optional<PlanPrice> findFirstPrice(Interval interval, PriceStatus status) {
         return this.prices.stream()
                 .filter(price -> price.getPriceInterval().equals(interval))
-                .filter(price -> price.getStatus().equals(draft))
-                .findFirst()
+                .filter(price -> price.getStatus().equals(status))
+                .findFirst();
+    }
+
+    private boolean hasPrice(Interval interval, PriceStatus draft) {
+        return this.findFirstPrice(interval, draft)
                 .isPresent();
     }
 
@@ -354,10 +331,14 @@ public class Plan extends SoftDeletableEntity {
     }
 
     private PlanFeature getFeatureOrThrow(UUID featureId) {
-        return this.features.stream()
-                .filter(f -> f.getFeature().getId().equals(featureId))
-                .findFirst()
+        return getPlanFeature(featureId)
                 .orElseThrow(() -> PlanDomainException.featureNotFound(featureId));
+    }
+
+    private Optional<PlanFeature> getPlanFeature(UUID id) {
+        return this.features.stream()
+                .filter(f -> f.getId().equals(id))
+                .findFirst();
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -368,7 +349,11 @@ public class Plan extends SoftDeletableEntity {
 
         public PlanPrice add(Money price, Interval interval) {
             if (plan.isFree()) {
-                throw PlanDomainException.priceCannotBeAddedToFreePlan(plan.getId());
+                throw PlanDomainException.illegalOperation("Price cannot be added to FREE plans.");
+            }
+
+            if (!plan.isDraft() && !plan.isActive()) {
+                throw PlanDomainException.illegalOperation("Plan must be in DRAFT or ACTIVE status to add price");
             }
             plan.ensurePriceUniquenessOn(interval, PriceStatus.DRAFT);
             PlanPrice planPrice = PlanPrice.builder()
@@ -392,34 +377,114 @@ public class Plan extends SoftDeletableEntity {
          *                             status
          */
         public void delete(UUID priceId) throws PlanDomainException {
+            if (priceId == null) {
+                throw new InvalidInputException("priceId cannot be null.");
+            }
+
+            if (!plan.isDraft() && !plan.isActive()) {
+                throw PlanDomainException.illegalOperation("Plan must be in DRAFT or ACTIVE status to delete price");
+            }
             Optional<PlanPrice> priceOpt = plan.prices.stream()
                     .filter(p -> p.getId().equals(priceId))
                     .findFirst();
 
             if (priceOpt.isEmpty()) {
-                throw PlanDomainException.priceNotFound(priceId);
+                return;
             }
 
             PlanPrice price = priceOpt.get();
             if (!price.isDraft()) {
-                throw PlanDomainException.priceCannotBeDeleted("Only prices in DRAFT status can be deleted");
+                throw PlanDomainException.illegalOperation("Only prices in DRAFT status can be deleted");
             }
 
             plan.prices.remove(price);
         }
 
-        public void update(UUID priceId, Money price, Interval newInterval) {
-            PlanPrice planPrice = plan.prices.stream()
-                    .filter(p -> p.getId().equals(priceId))
-                    .findFirst()
-                    .orElseThrow(() -> PlanDomainException.priceNotFound(priceId));
+        // public void update(UUID priceId, Money price, Interval newInterval) {
+        // PlanPrice planPrice = plan.prices.stream()
+        // .filter(p -> p.getId().equals(priceId))
+        // .findFirst()
+        // .orElseThrow(() -> PlanDomainException.priceNotFound(priceId));
 
-            Interval priceOldInterval = planPrice.getPriceInterval();
-            if (!Objects.equals(priceOldInterval, newInterval)) {
-                plan.ensurePriceUniquenessOn(newInterval, planPrice.getStatus());
+        // Interval priceOldInterval = planPrice.getPriceInterval();
+        // if (!Objects.equals(priceOldInterval, newInterval)) {
+        // plan.ensurePriceUniquenessOn(newInterval, planPrice.getStatus());
+        // }
+        // planPrice.update(price, newInterval);
+
+        // }
+
+        /**
+         * Marks the price as ARCHIVING. If price not found, then ignores.
+         * 
+         * @param priceId priceId to be archived
+         * @throws PlanDomainException If plan or price is not active status.
+         */
+        public void reserveForArchive(UUID priceId) throws PlanDomainException {
+            if (!plan.isActive()) {
+                throw PlanDomainException.illegalOperation(
+                        "To archive a price, plan must be in ACTIVE status, but found: {}", plan.status.name());
             }
-            planPrice.update(price, newInterval);
+            if (!hasAnyPricesOtherThan(priceId)) {
+                throw PlanDomainException.atleastOnePrice(
+                        "Active plan must have at least one active price.");
+            }
 
+            findPrice(priceId).ifPresent(p -> p.reserveForArchiving());
+        }
+
+        public void reserveForActivation(UUID priceId, boolean overrideActivePrice) {
+            if (!plan.isActive()) {
+                throw PlanDomainException.illegalOperation(
+                        "To activate a price, plan must be in ACTIVE status, but found: {}", plan.status.name());
+            }
+
+            PlanPrice targetPrice = findPriceOrThrow(priceId);
+
+            Optional<PlanPrice> activePriceForSameInterval = plan.findFirstPrice(targetPrice.getPriceInterval(),
+                    PriceStatus.ACTIVE)
+                    .filter(price -> !price.getId().equals(priceId));
+
+            if (activePriceForSameInterval.isPresent()) {
+                if (overrideActivePrice) {
+                    activePriceForSameInterval.get().reserveForArchiving();
+                } else {
+                    throw PlanDomainException.illegalOperation(
+                            "An active price already exists for interval: " + targetPrice.getPriceInterval());
+                }
+            }
+
+            targetPrice.reserveForActivation();
+        }
+
+        private Optional<PlanPrice> findPrice(UUID priceId) {
+            return plan.prices.stream()
+                    .filter(price -> price.getId().equals(priceId))
+                    .findFirst();
+        }
+
+        private PlanPrice findPriceOrThrow(UUID priceId) {
+            return findPrice(priceId)
+                    .orElseThrow(() -> PlanDomainException.priceNotFound(priceId));
+        }
+
+        private boolean hasAnyPricesOtherThan(UUID priceId) {
+            return plan.prices.stream()
+                    .filter(price -> !price.getId().equals(priceId))
+                    .findFirst()
+                    .isPresent();
+        }
+
+        public void finalizeActivation(UUID priceId, String providerPriceId) {
+            PlanPrice targetPrice = findPriceOrThrow(priceId);
+            targetPrice.activate(providerPriceId);
+        }
+
+        public void markAsFailed(UUID priceId, String reason) {
+            plan.prices.stream()
+                    .filter(price -> price.getId().equals(priceId))
+                    .findFirst()
+                    .ifPresent(price -> price.activationFailed(reason));
         }
 
     }
@@ -441,6 +506,8 @@ public class Plan extends SoftDeletableEntity {
                 throw new InvalidInputException("Feature cannot be null");
             }
 
+            ensureFeatureManagementAllowed("add");
+
             if (this.plan.hasFeature(feature)) {
                 throw PlanDomainException.duplicateFeature(feature.getCode());
             }
@@ -449,13 +516,31 @@ public class Plan extends SoftDeletableEntity {
             this.plan.features.add(planFeature);
         }
 
+        private boolean planHasAnyFeatureExcept(UUID featureId) {
+            return plan.features.stream().anyMatch(f -> !f.getId().equals(featureId));
+        }
+
         /**
          * Deletes a feature from the plan.
          * 
          * @param featureId The ID of the feature to delete.
          */
         public void delete(UUID featureId) throws PlanDomainException {
+            if (featureId == null) {
+                throw new InvalidInputException("Feature ID cannot be null");
+            }
+            ensureFeatureManagementAllowed("delete");
+            if (plan.isActive() && !planHasAnyFeatureExcept(featureId)) {
+                throw PlanDomainException.illegalOperation("Active plan must have at least one feature.");
+            }
             plan.features.removeIf(f -> f.getId().equals(featureId));
+        }
+
+        private void ensureFeatureManagementAllowed(String todo) {
+            if (!plan.isActive() && !plan.isDraft()) {
+                throw PlanDomainException
+                        .illegalOperation("Plan must be in ACTIVE or DRAFT status to {} a feature " + todo);
+            }
         }
 
         /**
@@ -466,8 +551,12 @@ public class Plan extends SoftDeletableEntity {
          * @throws PlanDomainException If the feature is not found.
          */
         public void updateValue(UUID featureId, String value) throws PlanDomainException {
-            PlanFeature feature = plan.getFeatureOrThrow(featureId);
-            feature.setValue(value);
+            ensureFeatureManagementAllowed("update");
+            plan.getPlanFeature(featureId).ifPresent(feat -> feat.setValue(value));
+        }
+
+        public PlanFeature getLast() {
+            return plan.features.getLast();
         }
 
     }

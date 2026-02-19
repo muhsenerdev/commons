@@ -10,4 +10,6 @@ public interface PaymentGateway {
      *         populated.
      */
     PlanPaymentDto createPlanAndPrices(PlanPaymentDto planPaymentDto);
+
+    PricePaymentDto createPrice(PricePaymentDto pricePaymentDto, String planProviderId);
 }

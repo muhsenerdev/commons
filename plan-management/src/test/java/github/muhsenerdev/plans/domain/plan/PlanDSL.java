@@ -25,6 +25,7 @@ public class PlanDSL {
     private int tier;
     private final List<FeatureConfig> features = new ArrayList<>();
     private final List<PriceConfig> prices = new ArrayList<>();
+    private PlanStatus status;
 
     public PlanDSL() {
         this.code = "PLAN-" + UUID.randomUUID().toString().substring(0, 8);
@@ -39,7 +40,11 @@ public class PlanDSL {
         return new PlanDSL();
     }
 
-    public static PlanDSL draftPlan() {
+    public static PlanDSL anActivePlan() {
+        return new PlanDSL();
+    }
+
+    public static PlanDSL aPlan() {
         return new PlanDSL();
     }
 
@@ -68,6 +73,11 @@ public class PlanDSL {
         return this;
     }
 
+    public PlanDSL withStatus(PlanStatus status) {
+        this.status = status;
+        return this;
+    }
+
     public PlanDSL withFeature(Consumer<FeatureBuilder> featureBuilderConsumer) {
         FeatureBuilder builder = new FeatureBuilder();
         featureBuilderConsumer.accept(builder);
@@ -75,9 +85,21 @@ public class PlanDSL {
         return this;
     }
 
+    public PlanDSL withFeature() {
+        FeatureBuilder builder = new FeatureBuilder();
+        this.features.add(builder.buildConfig());
+        return this;
+    }
+
     public PlanDSL withPrice(Consumer<PriceBuilder> priceBuilderConsumer) {
         PriceBuilder builder = new PriceBuilder();
         priceBuilderConsumer.accept(builder);
+        this.prices.add(builder.buildConfig());
+        return this;
+    }
+
+    public PlanDSL withPrice() {
+        PriceBuilder builder = new PriceBuilder();
         this.prices.add(builder.buildConfig());
         return this;
     }
@@ -91,21 +113,36 @@ public class PlanDSL {
                 .type(type)
                 .tier(tier)
                 .build();
+        if (status != null) {
+            ReflectionTestUtils.setField(plan, "status", status);
+        }
 
+        List<PlanFeature> planFeatures = new ArrayList<>();
         for (FeatureConfig config : features) {
             Feature feature = Feature.builder()
                     .code(config.code)
                     .name(config.name)
                     .type(config.type)
                     .build();
-            plan.features().add(feature, config.value);
+            ReflectionTestUtils.setField(feature, "id", config.id);
+            PlanFeature planFeature = PlanFeature.create(plan, feature, config.value);
+            ReflectionTestUtils.setField(planFeature, "id", config.id);
+            planFeatures.add(planFeature);
         }
+        ReflectionTestUtils.setField(plan, "features", planFeatures);
 
+        List<PlanPrice> planPrices = new ArrayList<>();
         for (PriceConfig config : prices) {
-            Money money = Money.of(config.amount, config.currency);
-            PlanPrice addedPrice = plan.prices().add(money, config.interval);
-            ReflectionTestUtils.setField(addedPrice, "id", UUID.randomUUID());
+            PlanPrice planPrice = PlanPrice.builder()
+                    .price(Money.of(config.amount, config.currency))
+                    .interval(config.interval)
+                    .status(config.status)
+                    .build();
+            ReflectionTestUtils.setField(planPrice, "id", UUID.randomUUID());
+            ReflectionTestUtils.setField(planPrice, "status", config.status);
+            planPrices.add(planPrice);
         }
+        ReflectionTestUtils.setField(plan, "prices", planPrices);
 
         return plan;
     }
@@ -143,10 +180,16 @@ public class PlanDSL {
     }
 
     public static class FeatureBuilder {
+        private UUID id = UUID.randomUUID();
         private String code = "FEAT-" + UUID.randomUUID().toString().substring(0, 8);
         private String name = "Feature Name";
         private FeatureType type = FeatureType.BOOLEAN;
         private String value = "true";
+
+        public FeatureBuilder withId(UUID id) {
+            this.id = id;
+            return this;
+        }
 
         public FeatureBuilder withCode(String code) {
             this.code = code;
@@ -169,7 +212,7 @@ public class PlanDSL {
         }
 
         FeatureConfig buildConfig() {
-            return new FeatureConfig(code, name, type, value);
+            return new FeatureConfig(id, code, name, type, value);
         }
     }
 
@@ -177,6 +220,7 @@ public class PlanDSL {
         private BigDecimal amount = BigDecimal.TEN;
         private String currency = "USD";
         private Interval interval = Interval.MONTHLY;
+        private PriceStatus status = PriceStatus.DRAFT;
 
         public PriceBuilder withAmount(BigDecimal amount) {
             this.amount = amount;
@@ -198,14 +242,19 @@ public class PlanDSL {
             return this;
         }
 
+        public PriceBuilder withStatus(PriceStatus status) {
+            this.status = status;
+            return this;
+        }
+
         PriceConfig buildConfig() {
-            return new PriceConfig(amount, currency, interval);
+            return new PriceConfig(amount, currency, interval, status);
         }
     }
 
-    private record FeatureConfig(String code, String name, FeatureType type, String value) {
+    private record FeatureConfig(UUID id, String code, String name, FeatureType type, String value) {
     }
 
-    private record PriceConfig(BigDecimal amount, String currency, Interval interval) {
+    private record PriceConfig(BigDecimal amount, String currency, Interval interval, PriceStatus status) {
     }
 }

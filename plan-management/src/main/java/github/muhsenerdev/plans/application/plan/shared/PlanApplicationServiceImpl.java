@@ -8,20 +8,8 @@ import github.muhsenerdev.plans.application.plan.activate.ActivatePlanCommandHan
 import github.muhsenerdev.plans.application.plan.create.CreatePlanCommand;
 import github.muhsenerdev.plans.application.plan.create.CreatePlanCommandHandler;
 import github.muhsenerdev.plans.application.plan.create.PlanCreationResponse;
-import github.muhsenerdev.plans.application.plan.feature.add.AddPlanFeatureCommand;
-import github.muhsenerdev.plans.application.plan.feature.add.AddPlanFeatureCommandHandler;
-import github.muhsenerdev.plans.application.plan.feature.add.AddPlanFeatureResponse;
-import github.muhsenerdev.plans.application.plan.feature.archive.DeletePlanFeatureCommand;
-import github.muhsenerdev.plans.application.plan.feature.archive.DeletePlanFeatureCommandHandler;
-import github.muhsenerdev.plans.application.plan.feature.update_value.UpdatePlanFeatureValueCommand;
-import github.muhsenerdev.plans.application.plan.feature.update_value.UpdatePlanFeatureValueCommandHandler;
-import github.muhsenerdev.plans.application.plan.price.add_price.AddPriceCommand;
-import github.muhsenerdev.plans.application.plan.price.add_price.AddPriceCommandHandler;
-import github.muhsenerdev.plans.application.plan.price.add_price.AddPriceResponse;
-import github.muhsenerdev.plans.application.plan.price.delete_price.DeletePriceCommand;
-import github.muhsenerdev.plans.application.plan.price.delete_price.DeletePriceCommandHandler;
-import github.muhsenerdev.plans.application.plan.price.update_price.UpdatePriceCommand;
-import github.muhsenerdev.plans.application.plan.price.update_price.UpdatePriceCommandHandler;
+import github.muhsenerdev.plans.application.plan.delete.DeletePlanCommand;
+import github.muhsenerdev.plans.application.plan.delete.DeletePlanCommandHandler;
 import github.muhsenerdev.plans.application.plan.update.UpdatePlanCommand;
 import github.muhsenerdev.plans.application.plan.update.UpdatePlanCommandHandler;
 import lombok.RequiredArgsConstructor;
@@ -33,13 +21,8 @@ public class PlanApplicationServiceImpl implements PlanApplicationService {
 
     private final CreatePlanCommandHandler createPlanCommandHandler;
     private final UpdatePlanCommandHandler updatePlanCommandHandler;
-    private final AddPriceCommandHandler addPriceCommandHandler;
-    private final DeletePriceCommandHandler deletePriceCommandHandler;
-    private final UpdatePriceCommandHandler updatePriceCommandHandler;
-    private final AddPlanFeatureCommandHandler addPlanFeatureCommandHandler;
-    private final DeletePlanFeatureCommandHandler deletePlanFeatureCommandHandler;
-    private final UpdatePlanFeatureValueCommandHandler updatePlanFeatureValueCommandHandler;
     private final ActivatePlanCommandHandler activatePlanCommandHandler;
+    private final DeletePlanCommandHandler deletePlanCommandHandler;
 
     @Override
     public PlanCreationResponse createPlan(CreatePlanCommand command) {
@@ -52,38 +35,13 @@ public class PlanApplicationServiceImpl implements PlanApplicationService {
     }
 
     @Override
-    public AddPriceResponse addPrice(AddPriceCommand command) {
-        return addPriceCommandHandler.handle(command);
-    }
-
-    @Override
-    public void deletePrice(DeletePriceCommand command) {
-        deletePriceCommandHandler.handle(command);
-    }
-
-    @Override
-    public void updatePrice(UpdatePriceCommand command) {
-        updatePriceCommandHandler.handle(command);
-    }
-
-    @Override
-    public AddPlanFeatureResponse addFeature(AddPlanFeatureCommand command) {
-        return addPlanFeatureCommandHandler.handle(command);
-    }
-
-    @Override
-    public void deleteFeature(DeletePlanFeatureCommand command) {
-        deletePlanFeatureCommandHandler.handle(command);
-    }
-
-    @Override
-    public void updateFeatureValue(UpdatePlanFeatureValueCommand command) {
-        updatePlanFeatureValueCommandHandler.handle(command);
-    }
-
-    @Override
     public void activatePlan(ActivatePlanCommand command) {
         activatePlanCommandHandler.handle(command);
+    }
+
+    @Override
+    public void deletePlan(DeletePlanCommand command) {
+        deletePlanCommandHandler.handle(command);
     }
 
 }

@@ -8,11 +8,11 @@ import github.muhsenerdev.commons.core.exception.DomainException;
 
 public class PlanDomainException extends DomainException {
 
-    protected PlanDomainException(String code, String message, Object... args) {
+    public PlanDomainException(String code, String message, Object... args) {
         super(code, message, args);
     }
 
-    protected PlanDomainException(String message, Object... args) {
+    public PlanDomainException(String message, Object... args) {
         super("plan.error", message, args);
     }
 
@@ -88,6 +88,26 @@ public class PlanDomainException extends DomainException {
 
     public static PlanDomainException featureNotFound(UUID featureId) {
         return new PlanDomainException("plan.feature_not_found", "Plan feature not found with id: {}", featureId);
+    }
+
+    public static PlanDomainException illegalOperation(String messageTemplate, Object... args) {
+        return new PlanDomainException("plan.illegal_operation", messageTemplate, args);
+    }
+
+    public static PlanDomainException atleastOneFeature(String message) {
+        return new PlanDomainException("plan.atleast_one_feature", message);
+    }
+
+    public static PlanDomainException atleastOnePrice(String message) {
+        return new PlanDomainException("plan.atleast_one_price", message);
+    }
+
+    public static PlanDomainException atleastOneFeature() {
+        return new PlanDomainException("plan.atleast_one_feature", "Plan must have at least one feature.");
+    }
+
+    public static PlanDomainException atleastOnePrice() {
+        return new PlanDomainException("plan.atleast_one_price", "Plan must have at least one price.");
     }
 
 }

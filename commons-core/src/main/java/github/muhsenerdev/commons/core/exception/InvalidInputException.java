@@ -13,4 +13,8 @@ public class InvalidInputException extends DomainException {
     public InvalidInputException(String code, String message, Object... args) {
         super(code, message, args);
     }
+
+    public static InvalidInputException of(String message) {
+        return new InvalidInputException(message);
+    }
 }

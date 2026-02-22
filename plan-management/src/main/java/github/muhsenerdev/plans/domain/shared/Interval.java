@@ -2,7 +2,8 @@ package github.muhsenerdev.plans.domain.shared;
 
 public enum Interval {
     MONTHLY,
-    YEARLY;
+    YEARLY,
+    INFINITE;
 
     public static Interval fromStringOrNull(String value) {
         for (Interval interval : Interval.values()) {
@@ -11,5 +12,17 @@ public enum Interval {
             }
         }
         return null;
+    }
+
+    public boolean isInfinite() {
+        return this == INFINITE;
+    }
+
+    public boolean isMonthly() {
+        return this == MONTHLY;
+    }
+
+    public boolean isYearly() {
+        return this == YEARLY;
     }
 }

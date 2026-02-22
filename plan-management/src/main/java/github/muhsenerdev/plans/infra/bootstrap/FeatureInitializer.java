@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import github.muhsenerdev.plans.domain.feature.Feature;
 import github.muhsenerdev.plans.domain.feature.FeatureRepository;
-import github.muhsenerdev.plans.infra.config.PlanFeaturesProperties;
+import github.muhsenerdev.plans.infra.config.PlanModuleProperties;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 public class FeatureInitializer {
 
     private final FeatureRepository featureRepository;
-    private final PlanFeaturesProperties properties;
+    private final PlanModuleProperties properties;
 
     @Transactional
     @PostConstruct

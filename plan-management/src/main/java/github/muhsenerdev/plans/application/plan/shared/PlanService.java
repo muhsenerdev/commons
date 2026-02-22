@@ -10,6 +10,7 @@ import org.springframework.util.Assert;
 
 import github.muhsenerdev.commons.core.exception.NotFoundException;
 import github.muhsenerdev.plans.domain.plan.Plan;
+import github.muhsenerdev.plans.domain.plan.PlanDomainService;
 import github.muhsenerdev.plans.domain.plan.PlanRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 public class PlanService {
 
     private final PlanRepository planRepository;
+    private final PlanDomainService planDomainService;
 
     @Transactional
     public Plan findByIdOrThrow(UUID id) {
@@ -51,7 +53,7 @@ public class PlanService {
     @Transactional
     public Plan reserveForActivation(UUID id) {
         Plan plan = findWithFeaturesOrThrow(id);
-        plan.reserveForActivation();
+        planDomainService.reserveForActivation(plan);
         return planRepository.save(plan);
     }
 

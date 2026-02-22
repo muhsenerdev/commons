@@ -35,6 +35,7 @@
         <passay.version>1.6.6</passay.version>
         <commons-validator.version>1.9.0</commons-validator.version>
         <jjwt.version>0.12.6</jjwt.version>
+        <stripe-java.version>31.3.0</stripe-java.version>
     </properties>
 
     <dependencyManagement>
@@ -118,6 +119,11 @@
                 <groupId>github.muhsenerdev</groupId>
                 <artifactId>app</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.stripe</groupId>
+                <artifactId>stripe-java</artifactId>
+                <version>${stripe-java.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

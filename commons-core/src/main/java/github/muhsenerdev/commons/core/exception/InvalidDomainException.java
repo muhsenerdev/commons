@@ -9,4 +9,8 @@ public class InvalidDomainException extends DomainException {
     public InvalidDomainException(String code, String message) {
         super(code, message);
     }
+
+    public InvalidDomainException(String code, String message, Object... args) {
+        super(code, message, args);
+    }
 }

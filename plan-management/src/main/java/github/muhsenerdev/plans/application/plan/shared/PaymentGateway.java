@@ -12,4 +12,6 @@ public interface PaymentGateway {
     PlanPaymentDto createPlanAndPrices(PlanPaymentDto planPaymentDto);
 
     PricePaymentDto createPrice(PricePaymentDto pricePaymentDto, String planProviderId);
+
+    CheckoutInfo startCheckout(CheckoutRequest request);
 }

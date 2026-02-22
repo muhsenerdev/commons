@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 
+import github.muhsenerdev.commons.core.util.AssertUtil;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -11,6 +12,16 @@ import lombok.RequiredArgsConstructor;
 public class PlanDomainService {
 
     private final PlanRepository planRepository;
+
+    public Plan reserveForActivation(Plan plan) {
+        AssertUtil.notNull(plan, "Plan cannot be null");
+        if (plan.isFree() && planRepository.existsActiveFreePlan()) {
+            throw PlanDomainException.onlyOneActiveFreePlan();
+        }
+
+        plan.reserveForActivation();
+        return plan;
+    }
 
     public Plan createPlan(PlanInput input) {
         ensureCodeIsUnique(input.code());

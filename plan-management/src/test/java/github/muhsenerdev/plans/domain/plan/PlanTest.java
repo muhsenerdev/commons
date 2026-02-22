@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.instancio.Instancio;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -16,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import github.muhsenerdev.commons.core.exception.InvalidDomainException;
 import github.muhsenerdev.commons.core.exception.InvalidInputException;
@@ -172,15 +172,55 @@ public class PlanTest {
         }
 
         @Test
-        @DisplayName("Given non-DRAFT plan, when updated, then throws Exception")
-        void whenPlanIsUpdated_thenItIsDraft() {
+        @DisplayName("Given non-DRAFT plan, when updated basic data (name, title, description), then success")
+        void givenNonDraftPlan_whenUpdateBasicData_thenSuccess() {
+            // ARRANGE
             Plan plan = PlanDSL.aPlan()
                     .withStatus(PlanStatus.ACTIVE)
                     .build();
 
-            assertThatThrownBy(() -> plan.updateFull(input))
-                    .isInstanceOf(PlanDomainException.class)
-                    .hasFieldOrPropertyWithValue("code", "plan.illegal_operation");
+            input = PlanInput.builder()
+                    .name("New Name")
+                    .title("New Title")
+                    .description("New Description")
+                    .build();
+
+            // ACT
+            plan.updateFull(input);
+
+            // ASSERT
+            assertThat(plan.getName()).isEqualTo("New Name");
+            assertThat(plan.getTitle()).isEqualTo("New Title");
+            assertThat(plan.getDescription()).isEqualTo("New Description");
+        }
+
+        @Test
+        @DisplayName("Given non-DRAFT plan, when update tier or code, then does not update")
+        void givenNonDraftPlan_whenUpdateTierOrCode_thenItDoesNotUpdate() {
+            // ARRANGE
+            Plan plan = PlanDSL.aPlan()
+                    .withStatus(PlanStatus.ACTIVE)
+                    .build();
+            int oldTier = plan.getTier();
+            String oldCode = plan.getCode();
+
+            input = PlanInput.builder()
+                    .tier(4)
+                    .code("New Code")
+                    .title("New Title")
+                    .description("New Description")
+                    .name("New Name")
+                    .build();
+
+            // ACT
+            plan.updateFull(input);
+
+            // ASSERT
+            assertThat(plan.getTier()).isEqualTo(oldTier);
+            assertThat(plan.getCode()).isEqualTo(oldCode);
+            assertThat(plan.getName()).isEqualTo(input.name());
+            assertThat(plan.getTitle()).isEqualTo(input.title());
+            assertThat(plan.getDescription()).isEqualTo(input.description());
         }
 
     }

@@ -18,6 +18,15 @@ public interface PlanRepository extends JpaRepository<Plan, UUID> {
     @Query("SELECT p FROM Plan p LEFT JOIN FETCH p.features pf LEFT JOIN FETCH pf.feature WHERE p.id = :id")
     Optional<Plan> findWithFeaturesDeeplyById(UUID id);
 
+    @Query("SELECT p FROM Plan p LEFT JOIN FETCH p.prices LEFT JOIN FETCH p.features pf LEFT JOIN FETCH pf.feature WHERE p.id = :id")
+    Optional<Plan> findWithPricesAndFeaturesById(UUID id);
+
     boolean existsByTier(int tier);
+
+    @Query("SELECT p FROM Plan p LEFT JOIN FETCH p.features pf LEFT JOIN FETCH pf.feature WHERE p.type = 'FREE' AND p.status = 'ACTIVE'")
+    Optional<Plan> findActiveFreePlan();
+
+    @Query("SELECT count(p) > 0 FROM Plan p WHERE p.type = 'FREE' AND p.status = 'ACTIVE'")
+    boolean existsActiveFreePlan();
 
 }

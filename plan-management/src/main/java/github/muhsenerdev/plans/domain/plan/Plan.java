@@ -207,8 +207,11 @@ public class Plan extends SoftDeletableEntity {
 
     public void updateFull(PlanInput input) {
         if (this.status != PlanStatus.DRAFT) {
-            throw PlanDomainException.illegalOperation("Only DRAFT plans can be updated. Plan Status: {}",
-                    this.status.name());
+            this.name = input.name();
+            this.title = input.title();
+            this.description = input.description();
+            validate();
+            return;
         }
         this.name = input.name();
         this.title = input.title();
@@ -219,35 +222,6 @@ public class Plan extends SoftDeletableEntity {
         validate();
     }
 
-    public void addFeature(Feature feature, String value) {
-        if (feature == null) {
-            throw new InvalidInputException("Feature cannot be null");
-        }
-
-        if (value == null || value.isEmpty()) {
-            throw new InvalidInputException("Feature value cannot be null or empty");
-        }
-
-        boolean featureExists = this.features.stream()
-                .anyMatch(f -> f.getFeature().getId().equals(feature.getId()));
-
-        if (featureExists) {
-            throw PlanDomainException.duplicateFeature(feature.getCode());
-        }
-
-        PlanFeature planFeature = PlanFeature.builder()
-                .plan(this)
-                .feature(feature)
-                .value(value)
-                .status(FeatureStatus.ACTIVE)
-                .build();
-        this.features.add(planFeature);
-    }
-
-    public Optional<PlanFeature> getLastFeature() {
-        return this.features.isEmpty() ? Optional.empty() : Optional.of(this.features.getLast());
-    }
-
     public boolean isActive() {
         return this.status == PlanStatus.ACTIVE;
     }
@@ -255,6 +229,14 @@ public class Plan extends SoftDeletableEntity {
     public boolean existsPriceById(UUID targetPriceId) {
         return this.prices.stream()
                 .anyMatch(price -> price.getId().equals(targetPriceId));
+    }
+
+    public Optional<PlanPrice> findPrice(UUID targetPriceId) {
+        if (targetPriceId == null)
+            return Optional.empty();
+        return this.prices.stream()
+                .filter(price -> price.getId().equals(targetPriceId))
+                .findFirst();
     }
 
     // ========== ACTIVATE PLAN PRICE ==========
@@ -567,5 +549,9 @@ public class Plan extends SoftDeletableEntity {
             return plan.features.getLast();
         }
 
+    }
+
+    public boolean isPaid() {
+        return this.type == PlanType.PAID;
     }
 }

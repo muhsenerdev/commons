@@ -110,4 +110,8 @@ public class PlanDomainException extends DomainException {
         return new PlanDomainException("plan.atleast_one_price", "Plan must have at least one price.");
     }
 
+    public static PlanDomainException onlyOneActiveFreePlan() {
+        return new PlanDomainException("plan.one_active_free_plan", "Only one active free plan can exist.");
+    }
+
 }

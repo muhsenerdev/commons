@@ -2,8 +2,6 @@ package github.muhsenerdev.commons.jpa.entity;
 
 import java.util.UUID;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import lombok.AllArgsConstructor;
@@ -16,10 +14,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class BaseJpaEntity extends AbstractBaseEntity {
+public abstract class AssignedIdBaseEntity extends AbstractBaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
 }

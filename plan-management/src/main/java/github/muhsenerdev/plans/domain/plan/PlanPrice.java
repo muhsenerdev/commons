@@ -1,10 +1,9 @@
 package github.muhsenerdev.plans.domain.plan;
 
-import java.util.function.IntPredicate;
-
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
+import github.muhsenerdev.commons.core.exception.InvalidDomainException;
 import github.muhsenerdev.commons.core.vo.Money;
 import github.muhsenerdev.commons.jpa.entity.SoftDeletableEntity;
 import github.muhsenerdev.plans.domain.shared.Interval;
@@ -31,7 +30,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @SQLDelete(sql = "UPDATE plan_prices SET deleted_at = CURRENT_TIMESTAMP WHERE id = ? AND version = ?")
 @SQLRestriction("deleted_at IS NULL")
 public class PlanPrice extends SoftDeletableEntity {
@@ -67,6 +65,9 @@ public class PlanPrice extends SoftDeletableEntity {
         this.price = price;
         this.priceInterval = interval;
         this.status = PriceStatus.DRAFT;
+        if (interval == null) {
+            throw new InvalidDomainException("Plan price requires interval.");
+        }
     }
 
     protected void reserveForArchiving() {

@@ -1,0 +1,6 @@
+app:
+  stripe: 
+    success-url: http://localhost:3000/checkout-success
+    cancel-url: http://localhost:300/checkout-cancel
+    webhook-secret: whsec_test
+    api-key: sk_test_test

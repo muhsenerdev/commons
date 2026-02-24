@@ -134,9 +134,9 @@ public class PlanDSL {
         List<PlanPrice> planPrices = new ArrayList<>();
         for (PriceConfig config : prices) {
             PlanPrice planPrice = PlanPrice.builder()
+                    .plan(plan)
                     .price(Money.of(config.amount, config.currency))
                     .interval(config.interval)
-                    .status(config.status)
                     .build();
             ReflectionTestUtils.setField(planPrice, "id", UUID.randomUUID());
             ReflectionTestUtils.setField(planPrice, "status", config.status);

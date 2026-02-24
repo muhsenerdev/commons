@@ -37,4 +37,8 @@ public final class Money implements Serializable {
         return new Money(BigDecimal.ZERO, currency);
     }
 
+    public String toString() {
+        return amount + " " + currency;
+    }
+
 }

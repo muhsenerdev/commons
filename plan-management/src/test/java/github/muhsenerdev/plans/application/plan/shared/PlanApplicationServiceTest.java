@@ -23,6 +23,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import github.muhsenerdev.commons.core.util.RandomUtil;
+import github.muhsenerdev.plans.PlanModuleTest;
 import github.muhsenerdev.plans.application.plan.create.CreatePlanCommand;
 import github.muhsenerdev.plans.application.plan.delete.DeletePlanCommand;
 import github.muhsenerdev.plans.domain.feature.FeatureRepository;
@@ -38,7 +39,8 @@ import jakarta.persistence.PersistenceContext;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@SpringBootTest(properties = { "spring.jpa.hibernate.ddl-auto=update", "spring.jpa.show-sql=true" })
+@SpringBootTest(classes = PlanModuleTest.class, properties = { "spring.jpa.hibernate.ddl-auto=update",
+        "spring.jpa.show-sql=true" })
 @ActiveProfiles("test")
 @Sql({ "classpath:schema.sql" })
 public class PlanApplicationServiceTest {
